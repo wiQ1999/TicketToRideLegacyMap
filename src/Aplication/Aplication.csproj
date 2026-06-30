@@ -29,10 +29,10 @@
 		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 
 		<!-- Display name -->
-		<ApplicationTitle>Aplication</ApplicationTitle>
+		<ApplicationTitle>Wsiąść do pociągu legacy</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.aplication</ApplicationId>
+		<ApplicationId>pl.wiktor.szczeszek.tickettoridelegacymap</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -72,9 +72,6 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="12.3.0" />
-		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.8" />
-		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
-		<PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.8" />
 	</ItemGroup>
 	
 </Project>
