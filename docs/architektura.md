@@ -95,7 +95,7 @@ Czysta definicja danych, bez logiki UI:
   - słownik stanów tras (`RouteId → RouteState`),
   - zbiór oznaczonych miast (`HashSet<CityId>`),
   - aktualny `WagonColor` gracza,
-  - wyliczane liczniki: suma wagonów z tras **wykonanych** i z tras **zaznaczonych** oraz limit całkowity (2.4).
+  - wyliczane liczniki: suma wagonów z tras **wykonanych** i z tras **zaznaczonych** (2.4).
   - Metody: `ToggleCity(id)`, `CycleRoute(id)` (None→Selected→Done→None), `SetWagonColor(color)`,
     `ResetGame()` (czyści wszystkie oznaczenia — „Nowa rozgrywka", 2.5).
   - Eksponuje zdarzenia/`INotifyPropertyChanged`, by page-modele reagowały na zmiany.

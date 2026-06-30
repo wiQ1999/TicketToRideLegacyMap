@@ -49,7 +49,7 @@ Aplikacja mobilna służąca jako cyfrowy pomocnik podczas rozgrywki w planszow�
   - liczby pociągów (wagonów) z **wykonanych** tras,
   - liczby pociągów (wagonów) z **zaznaczonych** (planowanych) tras.
 - Liczba pociągów (wagonów) przypisana do każdej trasy jest **wartością stałą, wbudowaną w mapę**, zgodną z oryginalną grą planszową (nie jest wpisywana ręcznie przez użytkownika).
-- Liczniki prezentowane są w **prostej formie liczbowej** (np. "12 / 45" - liczba wykorzystanych wagonów / całkowity limit wagonów gracza), bez dodatkowych elementów graficznych typu pasek postępu.
+- Liczniki prezentowane są w **prostej formie liczbowej** (np. "12 / 45" - liczba zaznaczonych wagonów tras / liczba wykonanych wagonów wykonanych tras gracza), bez dodatkowych elementów graficznych typu pasek postępu.
 
 ### 2.5 Widok ustawień / działań
 - W aplikacji istnieje dodatkowy, osobny widok (ekran) zawierający akcje, które nie powinny być dostępne bezpośrednio z widoku mapy, aby uniknąć przypadkowego ich wywołania:
