@@ -1,0 +1,23 @@
+{
+  "canvasSize": { "width": 2000, "height": 1200 },
+
+  "cities": [
+    { "id": "SEA", "name": "Seattle",         "x": 260,  "y": 180 },
+    { "id": "SLC", "name": "Salt Lake City",  "x": 560,  "y": 540 },
+    { "id": "SFO", "name": "San Francisco",   "x": 180,  "y": 620 },
+    { "id": "LAX", "name": "Los Angeles",     "x": 320,  "y": 880 },
+    { "id": "PHX", "name": "Phoenix",         "x": 640,  "y": 900 },
+    { "id": "DEN", "name": "Denver",          "x": 980,  "y": 620 }
+  ],
+
+  "routes": [
+    { "id": "SEA-SLC",   "from": "SEA", "to": "SLC", "wagons": 6, "color": "Blue" },
+    { "id": "SEA-SFO",   "from": "SEA", "to": "SFO", "wagons": 4, "color": "Green" },
+    { "id": "SFO-SLC",   "from": "SFO", "to": "SLC", "wagons": 5, "color": "Orange" },
+    { "id": "SFO-LAX",   "from": "SFO", "to": "LAX", "wagons": 3, "color": "Pink" },
+    { "id": "LAX-PHX",   "from": "LAX", "to": "PHX", "wagons": 3, "color": "Gray" },
+    { "id": "PHX-DEN",   "from": "PHX", "to": "DEN", "wagons": 5, "color": "White" },
+    { "id": "SLC-DEN-1", "from": "SLC", "to": "DEN", "wagons": 4, "color": "Yellow", "waypoints": [ { "x": 770, "y": 520 } ] },
+    { "id": "SLC-DEN-2", "from": "SLC", "to": "DEN", "wagons": 4, "color": "Red",    "waypoints": [ { "x": 770, "y": 640 } ] }
+  ]
+}
