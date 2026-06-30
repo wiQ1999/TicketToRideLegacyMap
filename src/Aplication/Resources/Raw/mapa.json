@@ -1,23 +1,24 @@
 {
-  "canvasSize": { "width": 2000, "height": 1200 },
+  "canvasSize": { "width": 168, "height": 283 },
+
+  "_comment": "PoC interakcji: wspolrzedne wytrasowane z docs/map_background_test_sample.png (przestrzen mapy = piksele podkladu 168x283). Wartosci przyblizone do dostrojenia z edytora grafiki. 5 miast, 8 tras (w tym zakrzywiona zolta/szara St. Louis-Omaha jako pokaz waypointow oraz pary tras rownoleglych).",
 
   "cities": [
-    { "id": "SEA", "name": "Seattle",         "x": 260,  "y": 180 },
-    { "id": "SLC", "name": "Salt Lake City",  "x": 560,  "y": 540 },
-    { "id": "SFO", "name": "San Francisco",   "x": 180,  "y": 620 },
-    { "id": "LAX", "name": "Los Angeles",     "x": 320,  "y": 880 },
-    { "id": "PHX", "name": "Phoenix",         "x": 640,  "y": 900 },
-    { "id": "DEN", "name": "Denver",          "x": 980,  "y": 620 }
+    { "id": "DUL", "name": "Duluth",      "x": 20,  "y": 38 },
+    { "id": "DAV", "name": "Davenport",   "x": 146, "y": 20 },
+    { "id": "STL", "name": "St. Louis",   "x": 139, "y": 100 },
+    { "id": "KAN", "name": "Kansas City", "x": 147, "y": 231 },
+    { "id": "OMA", "name": "Omaha",       "x": 68,  "y": 258 }
   ],
 
   "routes": [
-    { "id": "SEA-SLC",   "from": "SEA", "to": "SLC", "wagons": 6, "color": "Blue" },
-    { "id": "SEA-SFO",   "from": "SEA", "to": "SFO", "wagons": 4, "color": "Green" },
-    { "id": "SFO-SLC",   "from": "SFO", "to": "SLC", "wagons": 5, "color": "Orange" },
-    { "id": "SFO-LAX",   "from": "SFO", "to": "LAX", "wagons": 3, "color": "Pink" },
-    { "id": "LAX-PHX",   "from": "LAX", "to": "PHX", "wagons": 3, "color": "Gray" },
-    { "id": "PHX-DEN",   "from": "PHX", "to": "DEN", "wagons": 5, "color": "White" },
-    { "id": "SLC-DEN-1", "from": "SLC", "to": "DEN", "wagons": 4, "color": "Yellow", "waypoints": [ { "x": 770, "y": 520 } ] },
-    { "id": "SLC-DEN-2", "from": "SLC", "to": "DEN", "wagons": 4, "color": "Red",    "waypoints": [ { "x": 770, "y": 640 } ] }
+    { "id": "DUL-DAV",   "from": "DUL", "to": "DAV", "wagons": 4, "color": "Green",  "waypoints": [ { "x": 95, "y": 30 } ] },
+    { "id": "DUL-STL",   "from": "DUL", "to": "STL", "wagons": 5, "color": "Blue",   "waypoints": [ { "x": 88, "y": 60 } ] },
+    { "id": "DUL-STL-2", "from": "DUL", "to": "STL", "wagons": 5, "color": "Yellow", "waypoints": [ { "x": 80, "y": 76 } ] },
+    { "id": "STL-OMA-1", "from": "STL", "to": "OMA", "wagons": 5, "color": "Yellow", "waypoints": [ { "x": 112, "y": 150 }, { "x": 84, "y": 202 }, { "x": 70, "y": 240 } ] },
+    { "id": "STL-OMA-2", "from": "STL", "to": "OMA", "wagons": 5, "color": "Gray",   "waypoints": [ { "x": 126, "y": 158 }, { "x": 100, "y": 210 }, { "x": 84, "y": 248 } ] },
+    { "id": "STL-KAN",   "from": "STL", "to": "KAN", "wagons": 4, "color": "Black",  "waypoints": [ { "x": 142, "y": 162 } ] },
+    { "id": "STL-DAV",   "from": "STL", "to": "DAV", "wagons": 3, "color": "White",  "waypoints": [ { "x": 150, "y": 70 } ] },
+    { "id": "OMA-KAN",   "from": "OMA", "to": "KAN", "wagons": 5, "color": "Blue",   "waypoints": [ { "x": 112, "y": 252 } ] }
   ]
 }
