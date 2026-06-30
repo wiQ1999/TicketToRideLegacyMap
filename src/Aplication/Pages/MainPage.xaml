@@ -5,24 +5,33 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Wsiąść do pociągu">
 
-    <VerticalStackLayout
-        Padding="24"
-        Spacing="12"
-        HorizontalOptions="Center"
-        VerticalOptions="Center">
+    <Grid x:Name="RootLayout">
 
-        <Label
-            Style="{StaticResource Headline}"
-            Text="Wsiąść do pociągu: Legacy" />
+        <!-- Plansza (MapBoardView) jest wstawiana w kodzie po wczytaniu danych. -->
 
-        <Label
-            Style="{StaticResource SubHeadline}"
-            Text="Aplikacja-towarzysz" />
+        <ActivityIndicator
+            x:Name="LoadingIndicator"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            IsRunning="True" />
 
-        <Label
-            HorizontalTextAlignment="Center"
-            Text="Szkielet aplikacji. Mapa i ustawienia zostaną dodane w kolejnym etapie." />
+        <!-- Krótka legenda PoC: jak działa interakcja. -->
+        <Border
+            Margin="12"
+            Padding="10,6"
+            HorizontalOptions="Start"
+            VerticalOptions="Start"
+            BackgroundColor="#CC000000"
+            StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Label
+                FontSize="11"
+                TextColor="White"
+                Text="Tap miasta = oznacz/odznacz • Tap trasy = brak→zaznaczona→wykonana • Pinch = zoom • Pan = przesuń" />
+        </Border>
 
-    </VerticalStackLayout>
+    </Grid>
 
 </ContentPage>
