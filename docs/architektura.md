@@ -5,15 +5,14 @@ Bazuje na [specyfikacji](specyfikacja-aplikacji.md) (sekcje 2 i 3) oraz na anali
 .NET MAUI w `src/Aplication`.
 
 > Status: **opis architektury** — niniejszy etap nie wprowadza zmian w kodzie. Zawiera projekt docelowej
-> struktury oraz listę elementów szablonu do usunięcia, które zostaną zrealizowane w kolejnym etapie.
+> struktury aplikacji.
 
 ---
 
 ## 1. Punkt wyjścia — analiza obecnego projektu
 
-Projekt `src/Aplication` to **szablon „Project Manager"** (.NET MAUI + CommunityToolkit). Z perspektywy
-aplikacji-towarzysza jest to zestaw przykładowy, którego logika domenowa (projekty, zadania, kategorie, tagi)
-jest **w całości do usunięcia**. Wartościowe i do zachowania są natomiast wzorce techniczne szablonu:
+Projekt `src/Aplication` bazował na **szablonie „Project Manager"** (.NET MAUI + CommunityToolkit).
+Wartościowe i zachowane zostały wzorce techniczne szablonu:
 
 | Element szablonu | Decyzja | Uzasadnienie |
 |---|---|---|
@@ -21,11 +20,6 @@ jest **w całości do usunięcia**. Wartościowe i do zachowania są natomiast w
 | **DI w `MauiProgram.cs`** (`builder.Services.AddSingleton/AddTransient`) | **Zachować, przebudować rejestracje** | Serwis stanu i page-modele rejestrujemy jako singletony. |
 | **Nawigacja Shell** (`AppShell.xaml`) | **Zachować, uprościć** | Z `Flyout` z 3 zakładkami → minimalna nawigacja 2 ekranów. |
 | **`CommunityToolkit.Maui`** | **Zachować** | Przydatne behawiory/konwertery; toast nieobowiązkowy. |
-| **Warstwa danych** (`Data/`: repozytoria, `JsonContext`, `SeedDataService`, SQLite) | **Usunąć** | Wymaganie 3.2 — brak trwałości; stan tylko w pamięci. |
-| **Modele domenowe** (`Models/`: `Project`, `Task`, `Category`, `Tag`, …) | **Usunąć** | Domena „project managera" jest nieadekwatna. |
-| **`Syncfusion.Maui.Toolkit`** (wykres kategorii) | **Usunąć** | Brak wykresów w naszej aplikacji; mniej zależności. |
-| **`Microsoft.Data.Sqlite` + `SQLitePCLRaw`** | **Usunąć** | Brak bazy danych. |
-| **Kontrolki przykładowe** (`Pages/Controls/`: `CategoryChart`, `TaskView`, `ProjectCardView`, …) | **Usunąć** | Zastąpione własnymi kontrolkami mapy. |
 
 ### Stosowany wzorzec MVVM (do naśladowania)
 
@@ -137,7 +131,7 @@ Dwa ekrany — zgodnie z 3.4 brak ekranu pomocy/onboardingu.
   **jawną akcję nawigacyjną** — ikonę/przycisk „menu/ustawienia" w widoku mapy (`Shell.Current.GoToAsync("settings")`),
   zgodnie z 2.5 (akcje destrukcyjne nie są dostępne bezpośrednio z mapy). Powrót — standardowym „wstecz".
 - Rejestracja trasy `settings` w `MauiProgram.cs`; `MapPage` jako `ShellContent` startowy.
-- Brak `FlyoutFooter` z przełącznikiem motywu (element szablonu do usunięcia).
+- Brak `FlyoutFooter` z przełącznikiem motywu.
 
 ```
 MapPage (root, "//map")
@@ -194,38 +188,3 @@ src/Aplication/
 │   └── Raw/     (ewentualne dane/grafika mapy)
 └── Platforms/   (Android, iOS, MacCatalyst, Windows — z wymuszeniem landscape)
 ```
-
----
-
-## 8. Lista elementów szablonu do usunięcia
-
-> Do realizacji w **kolejnym** etapie (ten dokument niczego nie usuwa).
-
-### Pliki / katalogi
-- `Models/` — `Category.cs`, `CategoryChartData.cs`, `IconData.cs`, `Project.cs`, `ProjectTask.cs`, `ProjectsTags.cs`, `Tag.cs` *(wszystkie)*.
-- `PageModels/` — `IProjectTaskPageModel.cs`, `MainPageModel.cs`, `ManageMetaPageModel.cs`, `ProjectDetailPageModel.cs`, `ProjectListPageModel.cs`, `TaskDetailPageModel.cs` *(wszystkie)*.
-- `Pages/` — `MainPage.*`, `ManageMetaPage.*`, `ProjectDetailPage.*`, `ProjectListPage.*`, `TaskDetailPage.*` *(wszystkie)*.
-- `Pages/Controls/` — `AddButton.*`, `CategoryChart.*`, `ChartDataLabelConverter.cs`, `ChipDataTemplateSelector.cs`, `LegendExt.cs`, `ProjectCardView.*`, `TagView.*`, `TaskView.*` *(wszystkie przykładowe)*.
-- `Data/` — `CategoryRepository.cs`, `Constants.cs`, `JsonContext.cs`, `ProjectRepository.cs`, `SeedDataService.cs`, `TagRepository.cs`, `TaskRespository.cs` *(cały katalog)*.
-- `Utilities/` — `ProjectExtensions.cs`, `TaskUtilities.cs` *(przegląd; usunąć jeśli zależne od domeny szablonu)*.
-- `Resources/Raw/` — przykładowe zasoby seed (np. dane JSON szablonu), jeśli obecne.
-
-### `MauiProgram.cs`
-- Usunąć rejestracje: `ProjectRepository`, `TaskRepository`, `CategoryRepository`, `TagRepository`, `SeedDataService`, `MainPageModel`, `ProjectListPageModel`, `ManageMetaPageModel`.
-- Usunąć trasy `AddTransientWithShellRoute<ProjectDetailPage,…>("project")` i `…("task")`.
-- Usunąć `ConfigureSyncfusionToolkit()` i handler-mapping dla `CategoryChart`.
-- Dodać: `GameStateService`, `IMapDataProvider`, `MapPageModel`, `SettingsPageModel`, trasę `settings`.
-
-### `AppShell.xaml`
-- Usunąć 3 `ShellContent` (Dashboard/Projects/Manage Meta) i `Shell.FlyoutFooter` z `SfSegmentedControl` (przełącznik motywu).
-- Ustawić pojedynczy startowy `ShellContent` dla `MapPage`; usunąć `xmlns:sf` Syncfusion.
-
-### `Aplication.csproj` (pakiety NuGet)
-- Usunąć: `Syncfusion.Maui.Toolkit`, `Microsoft.Data.Sqlite.Core`, `SQLitePCLRaw.bundle_green`.
-- Zachować: `Microsoft.Maui.Controls`, `CommunityToolkit.Mvvm`, `CommunityToolkit.Maui`, `Microsoft.Extensions.Logging.Debug`.
-- Rozważyć zmianę `ApplicationTitle`/`ApplicationId`/`RootNamespace` na docelowe (np. `TicketToRide.Companion`).
-
-### Zasoby
-- `Resources/Styles/` — przegląd `Colors.xaml`/`Styles.xaml`, usunięcie kolorów/stylów specyficznych dla szablonu (np. styl wykresu).
-- `Resources/Fonts/` — usunięcie nieużywanych fontów (np. `FluentSystemIcons`, `SegoeUI-Semibold`, jeśli zbędne).
-- Ikony menu szablonu (`IconDashboard`, `IconProjects`, `IconMeta`, `IconLight`, `IconDark`) — usunąć, jeśli niewykorzystane.
