@@ -9,7 +9,6 @@ public sealed class Route(
     string id,
     string cityFromId,
     string cityToId,
-    RouteColor color,
     IReadOnlyList<MapPoint> points)
 {
     public string Id { get; } = id;
@@ -17,8 +16,6 @@ public sealed class Route(
     public string CityFromId { get; } = cityFromId;
 
     public string CityToId { get; } = cityToId;
-
-    public RouteColor Color { get; } = color;
 
     public IReadOnlyList<MapPoint> Points { get; } = points;
 
