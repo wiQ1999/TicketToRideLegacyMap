@@ -3,7 +3,7 @@ namespace Aplication.Rendering;
 /// <summary>
 /// Stan transformacji widoku mapy: skala i przesunięcie odwzorowujące przestrzeń mapy
 /// (logiczną, stałą) na przestrzeń ekranu (DIP wewnątrz kontrolki). Jeden obiekt wspólny
-/// dla rysowania i hit-testingu — co widać, to jest klikalne (renderowanie-mapy.md §3, §6).
+/// dla rysowania i hit-testingu — co widać, to jest klikalne.
 /// </summary>
 public sealed class MapViewport(double mapWidth, double mapHeight)
 {
@@ -23,12 +23,11 @@ public sealed class MapViewport(double mapWidth, double mapHeight)
     public double OffsetX { get; private set; }
     public double OffsetY { get; private set; }
 
-    /// <summary>Czy znamy już rozmiar kontrolki (po pierwszym layoucie).</summary>
     public bool HasView => ViewWidth > 0 && ViewHeight > 0;
 
     /// <summary>
-    /// Ustawia rozmiar kadru i (re)kalibruje widok „z lotu ptaka": fit-to-screen + wyśrodkowanie
-    /// (renderowanie-mapy.md §3.3). Wywoływane przy starcie i każdej zmianie rozmiaru.
+    /// Ustawia rozmiar kadru i (re)kalibruje widok „z lotu ptaka": fit-to-screen + wyśrodkowanie.
+    /// Wywoływane przy starcie i każdej zmianie rozmiaru.
     /// </summary>
     public void ResetToFit(double viewWidth, double viewHeight)
     {
@@ -41,12 +40,12 @@ public sealed class MapViewport(double mapWidth, double mapHeight)
 
         FitScale = Math.Min(viewWidth / MapWidth, viewHeight / MapHeight);
         Scale = FitScale;
-        OffsetX = (viewWidth - MapWidth * Scale) / 2.0;
-        OffsetY = (viewHeight - MapHeight * Scale) / 2.0;
+        OffsetX = (viewWidth - (MapWidth * Scale)) / 2.0;
+        OffsetY = (viewHeight - (MapHeight * Scale)) / 2.0;
     }
 
     public PointF MapToScreen(double mapX, double mapY) =>
-        new((float)(mapX * Scale + OffsetX), (float)(mapY * Scale + OffsetY));
+        new((float)((mapX * Scale) + OffsetX), (float)((mapY * Scale) + OffsetY));
 
     public PointF MapToScreen(MapPoint p) => MapToScreen(p.X, p.Y);
 
@@ -71,8 +70,8 @@ public sealed class MapViewport(double mapWidth, double mapHeight)
         var pivotMap = ScreenToMap(pivotScreen.X, pivotScreen.Y);
         Scale = clamped;
         // Dobierz Offset tak, by pivotMap mapował się z powrotem na pivotScreen.
-        OffsetX = pivotScreen.X - pivotMap.X * Scale;
-        OffsetY = pivotScreen.Y - pivotMap.Y * Scale;
+        OffsetX = pivotScreen.X - (pivotMap.X * Scale);
+        OffsetY = pivotScreen.Y - (pivotMap.Y * Scale);
         ClampOffset();
     }
 

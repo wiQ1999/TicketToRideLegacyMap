@@ -4,9 +4,9 @@ namespace Aplication.Controls;
 
 /// <summary>
 /// Interaktywna plansza: jeden <see cref="GraphicsView"/> rysujący całą mapę wektorowo
-/// (renderowanie-mapy.md §2) z obsługą gestów (pinch/pan/tap) modyfikujących wspólny
-/// <see cref="MapViewport"/>. Tap przechodzi przez <see cref="MapHitTester"/> do toggle miasta
-/// lub cyklu trasy. Stan interakcji jest zewnętrzny — zmiana stanu wywołuje ponowne rysowanie.
+/// z obsługą gestów (pinch/pan/tap) modyfikujących wspólny <see cref="MapViewport"/>. Tap
+/// przechodzi przez <see cref="MapHitTester"/> do toggle miasta lub cyklu trasy. Stan interakcji
+/// jest zewnętrzny — zmiana stanu wywołuje ponowne rysowanie.
 /// </summary>
 public sealed class MapBoardView : ContentView
 {
@@ -65,7 +65,7 @@ public sealed class MapBoardView : ContentView
             return;
         }
 
-        // Re-kalibracja widoku „z lotu ptaka" przy każdej zmianie rozmiaru (renderowanie-mapy.md §3.3).
+        // Re-kalibracja widoku „z lotu ptaka" przy każdej zmianie rozmiaru.
         _viewport.ResetToFit(_graphicsView.Width, _graphicsView.Height);
         _graphicsView.Invalidate();
     }

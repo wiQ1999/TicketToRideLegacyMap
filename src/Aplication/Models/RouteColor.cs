@@ -7,7 +7,6 @@ namespace Aplication.Models;
 /// </summary>
 public enum RouteColor
 {
-    /// <summary>Trasa neutralna — dowolny kolor kart wagonów.</summary>
     Gray,
     Red,
     Orange,

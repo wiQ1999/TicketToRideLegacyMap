@@ -3,11 +3,10 @@ namespace Aplication.Rendering;
 /// <summary>
 /// Centralne mapowanie <see cref="RouteColor"/> (kolor kart trasy — cecha mapy) na kolor RGB
 /// oraz kolor gracza dla tras wykonanych. Trzymane w jednym miejscu, by łatwo dostroić paletę
-/// na etapie UI (renderowanie-mapy.md §4.2).
+/// na etapie UI.
 /// </summary>
 public static class RouteColorPalette
 {
-    /// <summary>Kolor gracza dla tras w stanie <see cref="RouteState.Done"/> (placeholder PoC).</summary>
     public static readonly Color Player = Color.FromArgb("#2E7D32");
 
     public static Color ForRoute(RouteColor color) => color switch
