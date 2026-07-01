@@ -7,20 +7,14 @@ namespace Aplication.Rendering;
 /// </summary>
 public static class MapMetrics
 {
-    /// <summary>Promień okręgu miasta.</summary>
-    public const double CityRadius = 9.0;
+    /// <summary>Promień okręgu miasta (średnica = 2×). Steruje wielkością kropki miasta.</summary>
+    public const double CityRadius = 13.0;
 
     /// <summary>Grubość pierścienia oznaczenia miasta (obrys).</summary>
     public const double CityMarkRingWidth = 3.0;
 
-    /// <summary>Połowa grubości pasma wagonów (i bazowy próg trafienia trasy).</summary>
-    public const double WagonHalfWidth = 5.0;
-
-    /// <summary>Ułamek długości pola przeznaczony na przerwę między wagonami.</summary>
-    public const double WagonGapFraction = 0.20;
-
-    /// <summary>Margines od środka miasta, by wagony nie wchodziły pod okrąg.</summary>
-    public const double RouteEndMargin = 11.0;
+    /// <summary>Połowa grubości linii trasy (i bazowy próg trafienia trasy).</summary>
+    public const double WagonHalfWidth = 8.0;
 
     /// <summary>
     /// Minimalny komfortowy rozmiar celu dotyku w pikselach ekranu (DIP). Próg trafienia

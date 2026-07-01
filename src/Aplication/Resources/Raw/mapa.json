@@ -1,24 +1,24 @@
 {
   "canvasSize": { "width": 168, "height": 283 },
 
-  "_comment": "PoC interakcji: wspolrzedne wytrasowane z docs/map_background_test_sample.png (przestrzen mapy = piksele podkladu 168x283). Wartosci przyblizone do dostrojenia z edytora grafiki. 5 miast, 8 tras (w tym zakrzywiona zolta/szara St. Louis-Omaha jako pokaz waypointow oraz pary tras rownoleglych).",
+  "_comment": "PoC interakcji: wspolrzedne wytrasowane z docs/map_background_test_sample.png (przestrzen mapy = piksele podkladu 168x283). Trasa = lamana 'points': poczatek, granice miedzy wagonami i koniec (N wagonow = N+1 punktow). Rysowana jako prosta gruba linia przez wszystkie punkty.",
 
   "cities": [
-    { "id": "DUL", "name": "Duluth",      "x": 20,  "y": 38 },
-    { "id": "DAV", "name": "Davenport",   "x": 146, "y": 20 },
-    { "id": "STL", "name": "St. Louis",   "x": 139, "y": 100 },
-    { "id": "KAN", "name": "Kansas City", "x": 147, "y": 231 },
-    { "id": "OMA", "name": "Omaha",       "x": 68,  "y": 258 }
+    { "id": "DUL", "name": "Duluth",      "x": 20,  "y": 44 },
+    { "id": "DAV", "name": "Davenport",   "x": 146, "y": 23 },
+    { "id": "STL", "name": "St. Louis",   "x": 133, "y": 106 },
+    { "id": "KAN", "name": "Kansas City", "x": 145, "y": 229 },
+    { "id": "OMA", "name": "Omaha",       "x": 76,  "y": 262 }
   ],
 
   "routes": [
-    { "id": "DUL-DAV",   "from": "DUL", "to": "DAV", "wagons": 4, "color": "Green",  "waypoints": [ { "x": 95, "y": 30 } ] },
-    { "id": "DUL-STL",   "from": "DUL", "to": "STL", "wagons": 5, "color": "Blue",   "waypoints": [ { "x": 88, "y": 60 } ] },
-    { "id": "DUL-STL-2", "from": "DUL", "to": "STL", "wagons": 5, "color": "Yellow", "waypoints": [ { "x": 80, "y": 76 } ] },
-    { "id": "STL-OMA-1", "from": "STL", "to": "OMA", "wagons": 5, "color": "Yellow", "waypoints": [ { "x": 112, "y": 150 }, { "x": 84, "y": 202 }, { "x": 70, "y": 240 } ] },
-    { "id": "STL-OMA-2", "from": "STL", "to": "OMA", "wagons": 5, "color": "Gray",   "waypoints": [ { "x": 126, "y": 158 }, { "x": 100, "y": 210 }, { "x": 84, "y": 248 } ] },
-    { "id": "STL-KAN",   "from": "STL", "to": "KAN", "wagons": 4, "color": "Black",  "waypoints": [ { "x": 142, "y": 162 } ] },
-    { "id": "STL-DAV",   "from": "STL", "to": "DAV", "wagons": 3, "color": "White",  "waypoints": [ { "x": 150, "y": 70 } ] },
-    { "id": "OMA-KAN",   "from": "OMA", "to": "KAN", "wagons": 5, "color": "Blue",   "waypoints": [ { "x": 112, "y": 252 } ] }
+    { "id": "DUL-DAV",   "from": "DUL", "to": "DAV", "color": "Green",  "points": [ { "x": 48, "y": 37 }, { "x": 89, "y": 31 }, { "x": 130, "y": 25 } ] },
+    { "id": "DUL-STL",   "from": "DUL", "to": "STL", "color": "Blue",   "points": [ { "x": 31, "y": 47 }, { "x": 53, "y": 52 }, { "x": 74, "y": 57 }, { "x": 94, "y": 66 }, { "x": 110, "y": 82 }, { "x": 125, "y": 98 } ] },
+    { "id": "DUL-STL-2", "from": "DUL", "to": "STL", "color": "Yellow", "points": [ { "x": 30, "y": 49 }, { "x": 49, "y": 59 }, { "x": 67, "y": 69 }, { "x": 86, "y": 80 }, { "x": 105, "y": 90 }, { "x": 123, "y": 101 } ] },
+    { "id": "STL-OMA-1", "from": "STL", "to": "OMA", "color": "Yellow", "points": [ { "x": 100, "y": 115 }, { "x": 80, "y": 149 }, { "x": 65, "y": 192 }, { "x": 63, "y": 238 } ] },
+    { "id": "STL-OMA-2", "from": "STL", "to": "OMA", "color": "Gray",   "points": [ { "x": 117, "y": 119 }, { "x": 95, "y": 155 }, { "x": 82, "y": 198 }, { "x": 78, "y": 243 } ] },
+    { "id": "STL-KAN",   "from": "STL", "to": "KAN", "color": "Black",  "points": [ { "x": 135, "y": 117 }, { "x": 139, "y": 142 }, { "x": 142, "y": 167 }, { "x": 143, "y": 193 }, { "x": 145, "y": 218 } ] },
+    { "id": "STL-DAV",   "from": "STL", "to": "DAV", "color": "White",  "points": [ { "x": 138, "y": 96 }, { "x": 147, "y": 76 }, { "x": 149, "y": 56 }, { "x": 147, "y": 34 } ] },
+    { "id": "OMA-KAN",   "from": "OMA", "to": "KAN", "color": "Blue",   "points": [ { "x": 87, "y": 259 }, { "x": 97, "y": 256 }, { "x": 108, "y": 253 }, { "x": 118, "y": 248 }, { "x": 127, "y": 242 }, { "x": 136, "y": 235 } ] }
   ]
 }

@@ -144,13 +144,14 @@ public sealed class MapDataProvider : IMapDataProvider
                     $"Trasa „{dto.Id}\" odwołuje się do nieistniejącego miasta końcowego „{dto.To}\".");
             }
 
-            if (dto.Wagons < 1)
+            if (dto.Points is not { Count: >= 2 })
             {
-                throw new MapDataException($"Trasa „{dto.Id}\" musi mieć co najmniej 1 wagon.");
+                throw new MapDataException(
+                    $"Trasa „{dto.Id}\" musi mieć co najmniej 2 punkty (początek i koniec = 1 wagon).");
             }
 
-            var waypoints = dto.Waypoints?.Select(w => new MapPoint(w.X, w.Y)).ToArray();
-            routes.Add(new Route(dto.Id, dto.From, dto.To, dto.Wagons, dto.Color, waypoints));
+            var points = dto.Points.Select(p => new MapPoint(p.X, p.Y)).ToArray();
+            routes.Add(new Route(dto.Id, dto.From, dto.To, dto.Color, points));
         }
 
         return routes;
@@ -184,9 +185,8 @@ public sealed class MapDataProvider : IMapDataProvider
         public string? Id { get; set; }
         public string? From { get; set; }
         public string? To { get; set; }
-        public int Wagons { get; set; }
         public RouteColor Color { get; set; }
-        public List<PointDto>? Waypoints { get; set; }
+        public List<PointDto>? Points { get; set; }
     }
 
     private sealed class PointDto

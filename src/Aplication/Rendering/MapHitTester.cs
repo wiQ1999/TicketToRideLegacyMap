@@ -10,10 +10,10 @@ public readonly record struct MapHit(MapHitKind Kind, string Id)
 }
 
 /// <summary>
-/// Geometryczny hit-testing w przestrzeni mapy (renderowanie-mapy.md §6). Punkt dotyku jest
-/// przeliczany odwrotną transformacją do przestrzeni mapy, gdzie geometria jest stała. Próg
-/// trafienia skaluje się odwrotnie do zoomu, by cel pozostał klikalny przy każdym powiększeniu.
-/// Miasta mają priorytet nad trasami; przy kilku kandydatach wygrywa najbliższy.
+/// Geometryczny hit-testing w przestrzeni mapy. Punkt dotyku jest przeliczany odwrotną
+/// transformacją do przestrzeni mapy, gdzie geometria jest stała. Próg trafienia skaluje się
+/// odwrotnie do zoomu, by cel pozostał klikalny przy każdym powiększeniu. Miasta mają priorytet
+/// nad trasami; przy kilku kandydatach wygrywa najbliższy.
 /// </summary>
 public sealed class MapHitTester
 {
@@ -23,9 +23,8 @@ public sealed class MapHitTester
     public MapHitTester(MapData map)
     {
         _map = map;
-        var cities = map.Cities.ToDictionary(c => c.Id);
         _routePolylines = map.Routes
-            .Select(r => (r.Id, RouteGeometry.BuildPolyline(r, cities)))
+            .Select(r => (r.Id, r.Points))
             .ToList();
     }
 
