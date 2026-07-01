@@ -8,10 +8,7 @@ namespace Aplication.Rendering;
 public static class MapMetrics
 {
     /// <summary>Promień okręgu miasta (średnica = 2×). Steruje wielkością kropki miasta.</summary>
-    public const double CityRadius = 13.0;
-
-    /// <summary>Grubość pierścienia oznaczenia miasta (obrys).</summary>
-    public const double CityMarkRingWidth = 3.0;
+    public const double CityRadius = 14.0;
 
     /// <summary>Połowa grubości linii trasy (i bazowy próg trafienia trasy).</summary>
     public const double WagonHalfWidth = 8.0;
@@ -21,7 +18,4 @@ public static class MapMetrics
     /// dzielony przez skalę utrzymuje stały rozmiar celu na ekranie niezależnie od zoomu.
     /// </summary>
     public const double MinTouchTarget = 28.0;
-
-    /// <summary>Poniżej tej skali etykiety miast są ukrywane (odszumienie widoku ogólnego).</summary>
-    public const double LabelMinScale = 2.2;
 }
