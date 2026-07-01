@@ -7,8 +7,6 @@ namespace Aplication.Models;
 public enum RouteState
 {
     None,
-
     Selected,
-
     Done
 }
