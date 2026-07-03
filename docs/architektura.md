@@ -37,7 +37,7 @@ Przykład z `MainPageModel`: page-model dziedziczy po `ObservableObject`, właś
 | **Wzorzec architektoniczny** | MVVM (CommunityToolkit.Mvvm), warstwowy: Models → Services → PageModels → Pages. |
 | **Stan rozgrywki** | Pojedynczy serwis trzymany w pamięci (`GameStateService`), rejestrowany jako **singleton** w DI. Brak persystencji (3.2). |
 | **Trwałość** | **Brak.** Żadnego SQLite, plików, `Preferences` dla stanu gry. Stan inicjowany przy każdym starcie aplikacji „od zera" (3.2). |
-| **Dane mapy** | Statyczna definicja (miasta + trasy z liczbą wagonów i kolorem) wczytywana z zasobu w pamięci. Konkretne dane dostarczy zleceniodawca później (spec. 2.1, 4) — na tym etapie tylko model + provider. |
+| **Dane mapy** | Statyczna definicja (miasta + trasy z ich geometrią i liczbą wagonów) wczytywana z zasobu w pamięci. Konkretne dane dostarczy zleceniodawca później (spec. 2.1, 4) — na tym etapie tylko model + provider. |
 | **Offline** | Naturalnie spełnione — brak jakiejkolwiek komunikacji sieciowej (3.1). |
 | **Orientacja** | Wymuszony **landscape** na poziomie platformy (Android `MainActivity`, iOS `Info.plist`) — patrz §6 (3.3). |
 | **Język** | Teksty UI wyłącznie po polsku, „na sztywno" w XAML/kodzie — bez plików `.resx`/lokalizacji (2.6). |
@@ -59,7 +59,7 @@ Przykład z `MainPageModel`: page-model dziedziczy po `ObservableObject`, właś
 │  ── GameStateService (singleton), IMapDataProvider        │
 ├──────────────────────────────────────────────────────────┤
 │  Models  — model danych mapy + stan oznaczeń              │
-│  ── City, Route, MapData, RouteColor, RouteState,         │
+│  ── City, Route, MapData, RouteState,                     │
 │     CityMarkState, WagonColor                             │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -68,10 +68,9 @@ Przykład z `MainPageModel`: page-model dziedziczy po `ObservableObject`, właś
 
 Czysta definicja danych, bez logiki UI:
 
-- **`MapData`** — kontener: `IReadOnlyList<City>`, `IReadOnlyList<Route>`. Reprezentuje jeden, stały układ planszy (2.1).
-- **`City`** — `Id`, `Name`, pozycja na mapie (`X`, `Y` w przestrzeni mapy).
-- **`Route`** — `Id`, `CityFromId`, `CityToId`, `WagonCount` (stała liczba wagonów — 2.4/2.1), `Color` (`RouteColor`), geometria do narysowania.
-- **`RouteColor`** (enum) — kolory tras z oryginalnej gry, w tym `Gray` (neutralna) (2.1).
+- **`MapData`** — kontener: `IReadOnlyList<City>`, `IReadOnlyList<Route>` oraz `CanvasSize` (zakres przestrzeni mapy). Reprezentuje jeden, stały układ planszy (2.1).
+- **`City`** — `Id`, pozycja na mapie (`X`, `Y` w przestrzeni mapy).
+- **`Route`** — `Id`, `CityFromId`, `CityToId` oraz **ścieżka trasy** (łamana punktów w przestrzeni mapy); liczba wagonów (`WagonCount`) wynika z długości tej ścieżki (2.4).
 - **Stan oznaczeń** (osobno od danych bazowych mapy, bo resetowalny):
   - **`RouteState`** (enum) — `None` → `Selected` (zaznaczona/planowana) → `Done` (wykonana) → `None`; cykl 3-klikowy (2.3).
   - **`CityMarkState`** — oznaczenie miasta jako toggle bool (2.3).
@@ -106,8 +105,9 @@ Czysta definicja danych, bez logiki UI:
 
 - **`MapPage`** — wyświetla planszę z obsługą gestów **pinch-to-zoom** i **pan** (2.1); domyślnie cała plansza
   „z lotu ptaka" (2.1); klikalne miasta i trasy; nakładka z licznikami; przycisk/ikona przejścia do ustawień.
-  Rendering mapy: kontrolka rysująca (`GraphicsView`/`SKCanvasView`) lub warstwa `AbsoluteLayout` z elementami
-  miast i tras — wybór do doprecyzowania na etapie UI.
+  Rendering mapy: **pojedyncza kontrolka `GraphicsView` (`Microsoft.Maui.Graphics`)** rysująca całą planszę
+  wektorowo w jednym `IDrawable`, opakowana we własną kontrolkę mapy — szczegóły w
+  [renderowanie-mapy.md](renderowanie-mapy.md).
 - **`SettingsPage`** — przyciski „Nowa rozgrywka" i wybór koloru wagonów z palety (2.5).
 
 ---
@@ -167,7 +167,7 @@ src/Aplication/
 │   ├── MapData.cs
 │   ├── City.cs
 │   ├── Route.cs
-│   ├── RouteColor.cs
+│   ├── MapPoint.cs
 │   ├── RouteState.cs
 │   └── WagonColor.cs
 ├── Services/
