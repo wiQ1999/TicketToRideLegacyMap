@@ -1,23 +1,24 @@
 {
-  "canvasSize": { "width": 2000, "height": 1200 },
+  "canvasSize": { "width": 168, "height": 283 },
+
+  "_comment": "PoC interakcji: wspolrzedne wytrasowane z docs/map_background_test_sample.png (przestrzen mapy = piksele podkladu 168x283). Trasa = lamana 'points': poczatek, granice miedzy wagonami i koniec (N wagonow = N+1 punktow). Rysowana jako prosta gruba linia przez wszystkie punkty.",
 
   "cities": [
-    { "id": "SEA", "name": "Seattle",         "x": 260,  "y": 180 },
-    { "id": "SLC", "name": "Salt Lake City",  "x": 560,  "y": 540 },
-    { "id": "SFO", "name": "San Francisco",   "x": 180,  "y": 620 },
-    { "id": "LAX", "name": "Los Angeles",     "x": 320,  "y": 880 },
-    { "id": "PHX", "name": "Phoenix",         "x": 640,  "y": 900 },
-    { "id": "DEN", "name": "Denver",          "x": 980,  "y": 620 }
+    { "id": "DUL", "x": 21,  "y": 45 },
+    { "id": "DAV", "x": 146, "y": 23 },
+    { "id": "STL", "x": 133, "y": 106 },
+    { "id": "KAN", "x": 145, "y": 229 },
+    { "id": "OMA", "x": 76,  "y": 262 }
   ],
 
   "routes": [
-    { "id": "SEA-SLC",   "from": "SEA", "to": "SLC", "wagons": 6, "color": "Blue" },
-    { "id": "SEA-SFO",   "from": "SEA", "to": "SFO", "wagons": 4, "color": "Green" },
-    { "id": "SFO-SLC",   "from": "SFO", "to": "SLC", "wagons": 5, "color": "Orange" },
-    { "id": "SFO-LAX",   "from": "SFO", "to": "LAX", "wagons": 3, "color": "Pink" },
-    { "id": "LAX-PHX",   "from": "LAX", "to": "PHX", "wagons": 3, "color": "Gray" },
-    { "id": "PHX-DEN",   "from": "PHX", "to": "DEN", "wagons": 5, "color": "White" },
-    { "id": "SLC-DEN-1", "from": "SLC", "to": "DEN", "wagons": 4, "color": "Yellow", "waypoints": [ { "x": 770, "y": 520 } ] },
-    { "id": "SLC-DEN-2", "from": "SLC", "to": "DEN", "wagons": 4, "color": "Red",    "waypoints": [ { "x": 770, "y": 640 } ] }
+    { "id": "DUL-DAV",   "from": "DUL", "to": "DAV", "points": [ { "x": 48, "y": 37 }, { "x": 89, "y": 31 }, { "x": 130, "y": 25 } ] },
+    { "id": "STL-DAV",   "from": "STL", "to": "DAV", "points": [ { "x": 144, "y": 43 }, { "x": 136, "y": 86 } ] },
+    { "id": "DUL-STL-1", "from": "DUL", "to": "STL", "points": [ { "x": 48, "y": 52 }, { "x": 84, "y": 71 }, { "x": 121, "y": 90 } ] },
+    { "id": "DUL-STL-2", "from": "DUL", "to": "STL", "points": [ { "x": 41, "y": 67 }, { "x": 78, "y": 86 }, { "x": 114, "y": 106 } ] },
+    { "id": "STL-OMA-1", "from": "STL", "to": "OMA", "points": [ { "x": 100, "y": 115 }, { "x": 80, "y": 149 }, { "x": 65, "y": 192 }, { "x": 63, "y": 238 } ] },
+    { "id": "STL-OMA-2", "from": "STL", "to": "OMA", "points": [ { "x": 117, "y": 119 }, { "x": 95, "y": 155 }, { "x": 82, "y": 198 }, { "x": 78, "y": 243 } ] },
+    { "id": "STL-KAN",   "from": "STL", "to": "KAN", "points": [ { "x": 132, "y": 125 }, { "x": 127, "y": 170 }, { "x": 139, "y": 213 } ] },
+    { "id": "OMA-KAN",   "from": "OMA", "to": "KAN", "points": [ { "x": 91, "y": 252 }, { "x": 129, "y": 236 } ] }
   ]
 }

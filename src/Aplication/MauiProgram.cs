@@ -16,7 +16,6 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 fonts.AddFont("SegoeUI-Semibold.ttf", "SegoeSemibold");
-                fonts.AddFont("FluentSystemIcons-Regular.ttf", FluentUI.FontFamily);
             });
 
 #if DEBUG
@@ -25,7 +24,10 @@ public static class MauiProgram
 #endif
 
         builder.Services.AddSingleton<ModalErrorHandler>();
+        builder.Services.AddSingleton<IErrorHandler>(sp => sp.GetRequiredService<ModalErrorHandler>());
         builder.Services.AddSingleton<IMapDataProvider, MapDataProvider>();
+        builder.Services.AddSingleton<IMapInteractionState, MapInteractionState>();
+        builder.Services.AddTransient<MainPage>();
 
         return builder.Build();
     }
