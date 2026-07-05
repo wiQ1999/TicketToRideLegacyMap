@@ -126,6 +126,13 @@ public sealed class MapBoardView : ContentView
 
     private void OnStateChanged(object? sender, EventArgs e) => _graphicsView.Invalidate();
 
+    /// <summary>Programowo przybliża i centruje widok na wskazanym mieście (wynik wyszukiwania).</summary>
+    public void CenterOnCity(City city)
+    {
+        _viewport.CenterOn(city.Position);
+        _graphicsView.Invalidate();
+    }
+
     private async Task LoadBackgroundAsync()
     {
         try

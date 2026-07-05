@@ -53,6 +53,36 @@
                 TextColor="White" />
         </Border>
 
+        <!-- Wyszukiwanie miasta: podpowiedzi podczas wpisywania, wybór = zoom + oznaczenie. -->
+        <VerticalStackLayout
+            Margin="12,56,12,0"
+            HorizontalOptions="Center"
+            VerticalOptions="Start"
+            WidthRequest="280"
+            Spacing="4">
+
+            <Entry
+                x:Name="CitySearchEntry"
+                Placeholder="Szukaj miasta…"
+                BackgroundColor="White"
+                TextChanged="OnCitySearchTextChanged" />
+
+            <CollectionView
+                x:Name="CitySearchResults"
+                IsVisible="False"
+                BackgroundColor="White"
+                SelectionMode="Single"
+                SelectionChanged="OnCitySearchResultSelected"
+                MaximumHeightRequest="200">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Padding="10,8" Text="{Binding Name}" />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+
     </Grid>
 
 </ContentPage>

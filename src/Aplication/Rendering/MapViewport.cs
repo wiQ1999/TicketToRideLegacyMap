@@ -76,6 +76,24 @@ public sealed class MapViewport(double mapWidth, double mapHeight)
     }
 
     /// <summary>
+    /// Programowo przybliża i centruje widok na punkcie mapy <paramref name="target"/> (np. wynik
+    /// wyszukiwania miasta) — bez udziału gestu. Skala to <paramref name="zoomFactor"/>-krotność
+    /// widoku „z lotu ptaka", ograniczona do dozwolonego zakresu zoomu.
+    /// </summary>
+    public void CenterOn(MapPoint target, double zoomFactor = 4.0)
+    {
+        if (!HasView)
+        {
+            return;
+        }
+
+        Scale = Math.Clamp(FitScale * zoomFactor, FitScale, FitScale * MaxZoom);
+        OffsetX = (ViewWidth / 2.0) - (target.X * Scale);
+        OffsetY = (ViewHeight / 2.0) - (target.Y * Scale);
+        ClampOffset();
+    }
+
+    /// <summary>
     /// Utrzymuje co najmniej fragment planszy w kadrze. Gdy plansza jest mniejsza od kadru
     /// w danej osi (po wpasowaniu), pozostaje wyśrodkowana w tej osi.
     /// </summary>
