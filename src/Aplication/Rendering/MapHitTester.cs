@@ -15,19 +15,8 @@ public readonly record struct MapHit(MapHitKind Kind, string Id)
 /// odwrotnie do zoomu, by cel pozostał klikalny przy każdym powiększeniu. Miasta mają priorytet
 /// nad trasami; przy kilku kandydatach wygrywa najbliższy.
 /// </summary>
-public sealed class MapHitTester
+public sealed class MapHitTester(MapData map)
 {
-    private readonly MapData _map;
-    private readonly IReadOnlyList<(string Id, IReadOnlyList<MapPoint> Polyline)> _routePolylines;
-
-    public MapHitTester(MapData map)
-    {
-        _map = map;
-        _routePolylines = map.Routes
-            .Select(r => (r.Id, r.Points))
-            .ToList();
-    }
-
     public MapHit HitTest(PointF screen, MapViewport viewport)
     {
         var tap = viewport.ScreenToMap(screen.X, screen.Y);
@@ -37,7 +26,7 @@ public sealed class MapHitTester
             return new MapHit(MapHitKind.City, cityId);
         }
 
-        if (TryHitRoute(tap, viewport.Scale, out var routeId))
+        if (TryHitRoute(tap, out var routeId))
         {
             return new MapHit(MapHitKind.Route, routeId);
         }
@@ -51,7 +40,7 @@ public sealed class MapHitTester
         var bestDist = double.MaxValue;
         cityId = string.Empty;
 
-        foreach (var city in _map.Cities)
+        foreach (var city in map.Cities)
         {
             var dx = tap.X - city.X;
             var dy = tap.Y - city.Y;
@@ -66,19 +55,29 @@ public sealed class MapHitTester
         return cityId.Length > 0;
     }
 
-    private bool TryHitRoute(MapPoint tap, double scale, out string routeId)
+    private bool TryHitRoute(MapPoint tap, out string routeId)
     {
-        var hitWidth = Math.Max(MapMetrics.WagonHalfWidth, MapMetrics.MinTouchTarget / 2 / scale);
         var bestDist = double.MaxValue;
         routeId = string.Empty;
 
-        foreach (var (id, polyline) in _routePolylines)
+        foreach (var route in map.Routes)
         {
-            var dist = RouteGeometry.DistanceToPolyline(tap, polyline);
-            if (dist <= hitWidth && dist < bestDist)
+            foreach (var wagon in route.Wagons)
             {
-                bestDist = dist;
-                routeId = id;
+                if (!wagon.Contains(tap))
+                {
+                    continue;
+                }
+
+                var center = wagon.Center;
+                var dx = tap.X - center.X;
+                var dy = tap.Y - center.Y;
+                var dist = Math.Sqrt(dx * dx + dy * dy);
+                if (dist < bestDist)
+                {
+                    bestDist = dist;
+                    routeId = route.Id;
+                }
             }
         }
 
