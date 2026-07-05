@@ -26,11 +26,12 @@ Legenda trybu agenta: **plan** = analiza/projektowanie bez zmian w kodzie, **edi
 
 **Prompt:**
 Zaimplementuj model danych mapy zgodnie z [docs/architektura.md](architektura.md) (3.1) i
-[docs/renderowanie-mapy.md](renderowanie-mapy.md) (§6-7): `City` (Id, `Name`, współrzędne),
-`Route` (miasta końcowe, łamana punktów, `WagonCount` z jej długości), `MapData` (rozmiar planszy +
-listy). Dodaj `IMapDataProvider`/`MapDataProvider` wczytujący i walidujący `Resources/Raw/mapa.json`
-(unikalność identyfikatorów, istnienie miast końcowych, zakres współrzędnych). Uwzględnij pole
-`Name` miasta, potrzebne później do wyszukiwania (2.7) i trybu deweloperskiego (2.8).
+[docs/renderowanie-mapy.md](renderowanie-mapy.md) (§6-7): `City` (Id, `Name`, współrzędne), `Route`
+(miasta końcowe, lista wagoników `WagonRectangle` — dwa punkty przekątnej każdy, `WagonCount` wprost
+z liczby wagoników), `MapData` (rozmiar planszy + listy). Dodaj `IMapDataProvider`/`MapDataProvider`
+wczytujący i walidujący `Resources/Raw/mapa.json` (unikalność identyfikatorów, istnienie miast
+końcowych, zakres współrzędnych; bez walidacji nachodzenia/stykania wagoników). Pole `Name` miasta
+przyda się później do wyszukiwania (2.7) i trybu deweloperskiego (2.8).
 
 ---
 
@@ -52,11 +53,11 @@ zapisanego stanu. Zarejestruj w DI.
 
 **Prompt:**
 Zaimplementuj kontrolkę mapy (`MapBoardView` + `MapDrawable` + `MapViewport`) renderującą planszę,
-miasta i trasy zgodnie z [docs/renderowanie-mapy.md](renderowanie-mapy.md) (§1-4): jeden `IDrawable`
-w `GraphicsView`, przestrzeń mapy niezależna od ekranu, fit-to-screen jako widok domyślny, gesty
-**pinch-to-zoom** i **pan** (2.1, bez przycisku resetu — powrót przez pinch-out). Renderer ma być
-bezstanowy — stan wizualny (2.3) odpytywany z serwisu w Etapie 7. Na tym etapie widok jest tylko do
-wyświetlania.
+miasta i trasy (jako niezależne prostokąty wagoników — [docs/renderowanie-mapy.md](renderowanie-mapy.md)
+§3) zgodnie z §1-4 tego dokumentu: jeden `IDrawable` w `GraphicsView`, przestrzeń mapy niezależna od
+ekranu, fit-to-screen jako widok domyślny, gesty **pinch-to-zoom** i **pan** (2.1, bez przycisku
+resetu — powrót przez pinch-out). Renderer ma być bezstanowy — stan wizualny (2.3) odpytywany z
+serwisu w Etapie 7. Na tym etapie widok jest tylko do wyświetlania.
 
 ---
 
@@ -66,10 +67,12 @@ wyświetlania.
 **Prompt:**
 Zaimplementuj `IMapInteractionState`/`MapInteractionState` (oznaczenia miast — toggle, stany tras —
 cykl 3-klikowy) oraz podepnij hit-testing (`MapHitTester`, [renderowanie-mapy.md](renderowanie-mapy.md)
-§5) do gestów `MapBoardView`, zgodnie z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md)
+§5 — trafienie w trasę, gdy punkt mieści się w prostokącie dowolnego jej wagonika, bez marginesu
+tolerancji) do gestów `MapBoardView`, zgodnie z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md)
 (2.3): kliknięcie miasta = toggle; kliknięcie trasy = krok w cyklu zaznaczona → wykonana → reset;
 niezależne oznaczanie wielu miast i tras. Zapewnij wizualne rozróżnienie stanów trasy (obrys vs
-wypełnienie, patrz renderowanie-mapy.md §4) z użyciem koloru wagonów gracza. Brak funkcji undo (3.5).
+wypełnienie **każdego wagonika**, patrz renderowanie-mapy.md §4) z użyciem koloru wagonów gracza.
+Brak funkcji undo (3.5).
 
 ---
 
@@ -141,11 +144,12 @@ nazw (`ICityNameCatalog`, z podpowiedziami) oraz edycję i usuwanie pozycji z li
 
 **Prompt:**
 Rozszerz tryb deweloperski (Etap 12) o zarządzanie trasami zgodnie z
-[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.8): dodanie trasy przez wskazanie na
-mapie kolejnych punktów wyznaczających jej przebieg pomiędzy dwoma wybranymi miastami z roboczej
-listy oraz uzupełnienie pozostałych danych (m.in. liczby wagonów, wynikającej z liczby odcinków —
-[docs/renderowanie-mapy.md](renderowanie-mapy.md) §3). Dodaj edycję i usuwanie pozycji z roboczej
-listy tras.
+[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.8): dodanie trasy między dwoma
+wybranymi miastami z roboczej listy, gdzie deweloper oznacza każdy wagonik osobno — dwoma punktami
+wskazanymi na mapie (przekątna prostokąta wagonika), w kolejności od miasta początkowego do
+końcowego ([docs/renderowanie-mapy.md](renderowanie-mapy.md) §3, §7). `WagonCount` wynika wprost z
+liczby dodanych wagoników. Dodaj edycję i usuwanie pojedynczych wagoników oraz całych tras z roboczej
+listy.
 
 ---
 
@@ -177,12 +181,10 @@ pozostałości po onboardingu/pomocy (3.4).
 **Tryb:** edit
 
 **Prompt:**
-Po dostarczeniu przez zleceniodawcę rzeczywistych danych mapy (lista miast z nazwami, lista tras z
-liczbą wagonów — [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md), sekcje 2.1 i 4) zastąp
-dane placeholder z Etapu 4 pełnym układem planszy i dostrój współrzędne miast/tras względem grafiki
-tła. Uzupełnij `ICityNameCatalog` o pełną, docelową listę nazw miast. Zweryfikuj poprawność
-hit-testingu, wyszukiwania i liczników na pełnych danych.
-*(Etap zależny od dostarczenia danych — realizowany, gdy będą dostępne.)*
+Po dostarczeniu przez zleceniodawcę rzeczywistych danych mapy ([docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md),
+sekcje 2.1 i 4) zastąp dane placeholder z Etapu 4 pełnym układem planszy. Uzupełnij `ICityNameCatalog`
+o docelową listę nazw miast. Zweryfikuj hit-testing, wyszukiwanie i liczniki na pełnych danych.
+*(Etap zależny od dostarczenia danych.)*
 
 ---
 

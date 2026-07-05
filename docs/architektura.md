@@ -57,8 +57,11 @@ Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec *
 ### 3.1 Warstwa modeli (`Models/`)
 
 - **`MapData`** — kontener: `IReadOnlyList<City>`, `IReadOnlyList<Route>`, `CanvasSize`. Jeden, stały układ planszy (2.1).
-- **`City`** — `Id`, `Name` (nazwa wyświetlana — wyszukiwanie 2.7, tryb deweloperski 2.8), pozycja `X`/`Y`.
-- **`Route`** — `Id`, `CityFromId`, `CityToId`, ścieżka (łamana punktów); `WagonCount` z długości ścieżki (2.4).
+- **`City`** — `Id`, `Name` (nazwa wyświetlana, **nie renderowana na mapie** — wyszukiwanie 2.7, tryb
+  deweloperski 2.8), pozycja `X`/`Y`.
+- **`Route`** — `Id`, `CityFromId`, `CityToId`, lista wagoników (`WagonRectangle`: dwa punkty przekątnej
+  każdy — patrz [renderowanie-mapy.md](renderowanie-mapy.md) §3, §7); `WagonCount` = liczba wagoników,
+  wprost z danych. Ten sam model służy trybowi standardowemu i trybowi deweloperskiemu.
 - **Stan oznaczeń** (osobno od danych bazowych, bo resetowalny): `RouteState` (`None → Selected → Done`,
   cykl 3-klikowy, 2.3), `CityMarkState` (toggle, 2.3).
 - **`WagonColor`** (enum) — paleta gracza: `Czarny, Czerwony, Niebieski, Zielony, Żółty` (2.5).
