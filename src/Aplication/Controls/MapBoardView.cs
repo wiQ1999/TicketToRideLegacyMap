@@ -50,11 +50,20 @@ public sealed class MapBoardView : ContentView
         LoadBackgroundAsync().FireAndForgetSafeAsync();
     }
 
-    /// <summary>Ustawia nakładkę roboczą trybu deweloperskiego (znaczniki miast + wskazany punkt) i przerysowuje.</summary>
-    public void SetDeveloperOverlay(IReadOnlyList<MapPoint> markers, MapPoint? pendingPoint)
+    /// <summary>
+    /// Ustawia nakładkę roboczą trybu deweloperskiego (znaczniki miast, wskazany punkt — miasta lub
+    /// róg wagonika, oraz wagoniki roboczej trasy) i przerysowuje.
+    /// </summary>
+    public void SetDeveloperOverlay(
+        IReadOnlyList<MapPoint> markers,
+        MapPoint? pendingPoint,
+        bool isPendingPointWagonCorner,
+        IReadOnlyList<WagonRectangle> wagons)
     {
         _drawable.DeveloperMarkers = markers;
         _drawable.DeveloperPendingPoint = pendingPoint;
+        _drawable.DeveloperPendingPointIsWagonCorner = isPendingPointWagonCorner;
+        _drawable.DeveloperWagons = wagons;
         _graphicsView.Invalidate();
     }
 

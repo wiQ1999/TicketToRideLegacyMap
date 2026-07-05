@@ -24,4 +24,13 @@ public interface IDeveloperMapEditor
 
     /// <summary>Usuwa miasto o wskazanym <paramref name="id"/> z listy roboczej.</summary>
     void RemoveCity(string id);
+
+    /// <summary>Dodaje nową trasę między dwoma miastami z podanym kompletem wagoników; zwraca utworzony wpis.</summary>
+    Route AddRoute(string cityFromId, string cityToId, IReadOnlyList<WagonRectangle> wagons);
+
+    /// <summary>Aktualizuje miasta końcowe i komplet wagoników istniejącej trasy (po <paramref name="id"/>).</summary>
+    void UpdateRoute(string id, string cityFromId, string cityToId, IReadOnlyList<WagonRectangle> wagons);
+
+    /// <summary>Usuwa trasę o wskazanym <paramref name="id"/> z listy roboczej.</summary>
+    void RemoveRoute(string id);
 }

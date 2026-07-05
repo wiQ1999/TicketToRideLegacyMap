@@ -11,7 +11,8 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 {
     private static readonly Color CityMarkColor = Color.FromArgb("#EC407A");
     private static readonly Color DeveloperMarkerColor = Color.FromArgb("#1565C0");
-    private static readonly Color DeveloperPendingColor = Color.FromArgb("#EF6C00");
+    private static readonly Color DeveloperPendingCityColor = Color.FromArgb("#EF6C00");
+    private static readonly Color DeveloperPendingWagonColor = Color.FromArgb("#00897B");
 
     public Microsoft.Maui.Graphics.IImage? Background { get; set; }
 
@@ -20,6 +21,15 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
     /// <summary>Wskazany na mapie, jeszcze niezatwierdzony punkt (tryb deweloperski).</summary>
     public MapPoint? DeveloperPendingPoint { get; set; }
+
+    /// <summary>
+    /// Czy <see cref="DeveloperPendingPoint"/> to róg wagonika trasy, a nie pozycja miasta — decyduje
+    /// o kolorze znacznika, tak by oba tryby (miasta/trasy) były wizualnie rozróżnialne.
+    /// </summary>
+    public bool DeveloperPendingPointIsWagonCorner { get; set; }
+
+    /// <summary>Wagoniki roboczej trasy (dodawanej lub edytowanej) rysowane jako nakładka (tryb deweloperski).</summary>
+    public IReadOnlyList<WagonRectangle>? DeveloperWagons { get; set; }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
@@ -45,6 +55,25 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
     private void DrawDeveloperOverlay(ICanvas canvas)
     {
+        if (DeveloperWagons is { } wagons)
+        {
+            canvas.StrokeColor = DeveloperMarkerColor;
+            canvas.StrokeSize = 2f;
+            foreach (var wagon in wagons)
+            {
+                var corners = wagon.Corners.Select(viewport.MapToScreen).ToArray();
+                var path = new PathF();
+                path.MoveTo(corners[0]);
+                for (var i = 1; i < corners.Length; i++)
+                {
+                    path.LineTo(corners[i]);
+                }
+
+                path.Close();
+                canvas.DrawPath(path);
+            }
+        }
+
         if (DeveloperMarkers is { } markers)
         {
             canvas.FillColor = DeveloperMarkerColor;
@@ -59,7 +88,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         {
             var center = viewport.MapToScreen(pending);
             var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
-            canvas.StrokeColor = DeveloperPendingColor;
+            canvas.StrokeColor = DeveloperPendingPointIsWagonCorner ? DeveloperPendingWagonColor : DeveloperPendingCityColor;
             canvas.StrokeSize = 3f;
             canvas.DrawCircle(center.X, center.Y, radius);
             canvas.DrawLine(center.X - radius, center.Y, center.X + radius, center.Y);

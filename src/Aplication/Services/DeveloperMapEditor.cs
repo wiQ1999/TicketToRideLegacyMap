@@ -43,6 +43,26 @@ public sealed class DeveloperMapEditor : IDeveloperMapEditor
 
     public void RemoveCity(string id) => _cities.RemoveAll(c => c.Id == id);
 
+    public Route AddRoute(string cityFromId, string cityToId, IReadOnlyList<WagonRectangle> wagons)
+    {
+        var route = new Route(GenerateRouteId(cityFromId, cityToId), cityFromId, cityToId, wagons);
+        _routes.Add(route);
+        return route;
+    }
+
+    public void UpdateRoute(string id, string cityFromId, string cityToId, IReadOnlyList<WagonRectangle> wagons)
+    {
+        var index = _routes.FindIndex(r => r.Id == id);
+        if (index < 0)
+        {
+            return;
+        }
+
+        _routes[index] = new Route(id, cityFromId, cityToId, wagons);
+    }
+
+    public void RemoveRoute(string id) => _routes.RemoveAll(r => r.Id == id);
+
     // Bazowy identyfikator to wersaliki liter/cyfr z nazwy; przy kolizji dodawany jest sufiks liczbowy.
     private string GenerateId(string name)
     {
@@ -59,6 +79,20 @@ public sealed class DeveloperMapEditor : IDeveloperMapEditor
         var id = baseId;
         var suffix = 2;
         while (_cities.Any(c => c.Id == id))
+        {
+            id = $"{baseId}-{suffix++}";
+        }
+
+        return id;
+    }
+
+    // Bazowy identyfikator to para miast końcowych; przy kolizji dodawany jest sufiks liczbowy.
+    private string GenerateRouteId(string cityFromId, string cityToId)
+    {
+        var baseId = $"{cityFromId}-{cityToId}";
+        var id = baseId;
+        var suffix = 2;
+        while (_routes.Any(r => r.Id == id))
         {
             id = $"{baseId}-{suffix++}";
         }

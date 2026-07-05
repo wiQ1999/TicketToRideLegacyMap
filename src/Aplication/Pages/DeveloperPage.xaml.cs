@@ -39,7 +39,7 @@ public partial class DeveloperPage : ContentPage
         RefreshOverlay();
     }
 
-    private void OnMapPointPicked(object? sender, MapPoint point) => _pageModel.SetPickedPosition(point);
+    private void OnMapPointPicked(object? sender, MapPoint point) => _pageModel.HandleMapTap(point);
 
     private void OnOverlayChanged(object? sender, EventArgs e) => RefreshOverlay();
 
@@ -51,7 +51,11 @@ public partial class DeveloperPage : ContentPage
         }
 
         var markers = _pageModel.Cities.Select(c => c.Position).ToList();
-        _board.SetDeveloperOverlay(markers, _pageModel.PickedPosition);
+        _board.SetDeveloperOverlay(
+            markers,
+            _pageModel.OverlayPendingPoint,
+            _pageModel.IsOverlayPendingPointWagonCorner,
+            _pageModel.PendingWagons);
     }
 
     private void OnNameSuggestionSelected(object? sender, SelectionChangedEventArgs e)
@@ -63,5 +67,27 @@ public partial class DeveloperPage : ContentPage
 
         ((CollectionView)sender!).SelectedItem = null;
         _pageModel.SelectSuggestionCommand.Execute(name);
+    }
+
+    private void OnRouteCityFromSuggestionSelected(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is not string name)
+        {
+            return;
+        }
+
+        ((CollectionView)sender!).SelectedItem = null;
+        _pageModel.SelectRouteCityFromSuggestionCommand.Execute(name);
+    }
+
+    private void OnRouteCityToSuggestionSelected(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is not string name)
+        {
+            return;
+        }
+
+        ((CollectionView)sender!).SelectedItem = null;
+        _pageModel.SelectRouteCityToSuggestionCommand.Execute(name);
     }
 }
