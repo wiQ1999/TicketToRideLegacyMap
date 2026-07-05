@@ -1,31 +1,19 @@
 # Decyzje techniczne i architektura aplikacji
 
 Dokument projektowy dla aplikacji-towarzysza do gry **"Wsiąść do pociągu: Legacy — Legendy zachodu"**.
-Bazuje na [specyfikacji](specyfikacja-aplikacji.md) (sekcje 2 i 3) oraz na analizie istniejącego projektu
-.NET MAUI w `src/Aplication`.
-
-> Status: **opis architektury** — niniejszy etap nie wprowadza zmian w kodzie. Zawiera projekt docelowej
-> struktury aplikacji.
+Bazuje na [specyfikacji](specyfikacja-aplikacji.md) (sekcje 2 i 3) oraz na
+[renderowaniu mapy](renderowanie-mapy.md). Opisuje architekturę docelową — część elementów
+(`PageModels`, `SettingsPage`, `GameStateService`, tryb deweloperski, wyszukiwanie) nie jest
+jeszcze obecna w kodzie; weryfikuj założenia względem `src/Aplication`.
 
 ---
 
-## 1. Punkt wyjścia — analiza obecnego projektu
+## 1. Punkt wyjścia
 
-Projekt `src/Aplication` bazował na **szablonie „Project Manager"** (.NET MAUI + CommunityToolkit).
-Wartościowe i zachowane zostały wzorce techniczne szablonu:
-
-| Element szablonu | Decyzja | Uzasadnienie |
-|---|---|---|
-| **Wzorzec MVVM** (`ObservableObject` + `[ObservableProperty]` + `[RelayCommand]` z `CommunityToolkit.Mvvm`) | **Zachować** | Spójny, nowoczesny wzorzec; podział na `Pages` (widoki XAML) i `PageModels` (logika) jest dokładnie tym, czego potrzebujemy. |
-| **DI w `MauiProgram.cs`** (`builder.Services.AddSingleton/AddTransient`) | **Zachować, przebudować rejestracje** | Serwis stanu i page-modele rejestrujemy jako singletony. |
-| **Nawigacja Shell** (`AppShell.xaml`) | **Zachować, uprościć** | Z `Flyout` z 3 zakładkami → minimalna nawigacja 2 ekranów. |
-| **`CommunityToolkit.Maui`** | **Zachować** | Przydatne behawiory/konwertery; toast nieobowiązkowy. |
-
-### Stosowany wzorzec MVVM (do naśladowania)
-
-Przykład z `MainPageModel`: page-model dziedziczy po `ObservableObject`, właściwości oznaczone
-`[ObservableProperty]`, akcje jako `[RelayCommand]`, cykl życia obsługiwany komendami
-`Appearing`/`NavigatedTo`/`NavigatedFrom`. Ten sam szkielet zastosujemy w nowych page-modelach.
+Projekt `src/Aplication` powstał z szablonu „Project Manager" (.NET MAUI + CommunityToolkit).
+Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec **MVVM**
+(`CommunityToolkit.Mvvm`: `ObservableObject`, `[ObservableProperty]`, `[RelayCommand]`), DI w
+`MauiProgram.cs` oraz nawigację Shell — jako wzorce do zastosowania w kolejnych page-modelach.
 
 ---
 
@@ -33,14 +21,14 @@ Przykład z `MainPageModel`: page-model dziedziczy po `ObservableObject`, właś
 
 | Obszar | Decyzja |
 |---|---|
-| **Technologia** | .NET MAUI (zgodnie z istniejącym projektem; spełnia wymóg multiplatformowości Android/iOS — spec. 1, 3.6). |
+| **Technologia** | .NET MAUI (Android/iOS — spec. 1, 3.6). |
 | **Wzorzec architektoniczny** | MVVM (CommunityToolkit.Mvvm), warstwowy: Models → Services → PageModels → Pages. |
-| **Stan rozgrywki** | Pojedynczy serwis trzymany w pamięci (`GameStateService`), rejestrowany jako **singleton** w DI. Brak persystencji (3.2). |
-| **Trwałość** | **Brak.** Żadnego SQLite, plików, `Preferences` dla stanu gry. Stan inicjowany przy każdym starcie aplikacji „od zera" (3.2). |
-| **Dane mapy** | Statyczna definicja (miasta + trasy z ich geometrią i liczbą wagonów) wczytywana z zasobu w pamięci. Konkretne dane dostarczy zleceniodawca później (spec. 2.1, 4) — na tym etapie tylko model + provider. |
-| **Offline** | Naturalnie spełnione — brak jakiejkolwiek komunikacji sieciowej (3.1). |
-| **Orientacja** | Wymuszony **landscape** na poziomie platformy (Android `MainActivity`, iOS `Info.plist`) — patrz §6 (3.3). |
-| **Język** | Teksty UI wyłącznie po polsku, „na sztywno" w XAML/kodzie — bez plików `.resx`/lokalizacji (2.6). |
+| **Stan rozgrywki** | `GameStateService` w pamięci, singleton w DI. Brak persystencji (3.2). |
+| **Dane robocze trybu deweloperskiego** | Osobny stan w pamięci (nie mieszany z `GameStateService`); brak zapisu trwałego — jedynym wynikiem pracy jest eksport JSON do schowka (2.8). |
+| **Dane mapy** | Statyczna definicja (miasta + trasy) wczytywana z zasobu `Resources/Raw/mapa.json` (2.1, 4). |
+| **Offline** | Naturalnie spełnione — brak komunikacji sieciowej (3.1). |
+| **Orientacja** | Wymuszony **landscape** na poziomie platformy (3.3). |
+| **Język** | Teksty UI wyłącznie po polsku, „na sztywno" w kodzie/XAML — bez `.resx` (2.6). |
 | **Undo / onboarding / pomoc** | Brak — nieobecne w architekturze świadomie (3.4, 3.5). |
 
 ---
@@ -48,67 +36,71 @@ Przykład z `MainPageModel`: page-model dziedziczy po `ObservableObject`, właś
 ## 3. Podział na warstwy
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Pages (XAML + code-behind)  — widoki, gesty, rendering   │
-│  ── MapPage, SettingsPage                                 │
-├──────────────────────────────────────────────────────────┤
-│  PageModels (MVVM)  — stan widoku, komendy                │
-│  ── MapPageModel, SettingsPageModel                       │
-├──────────────────────────────────────────────────────────┤
-│  Services  — logika rozgrywki w pamięci                   │
-│  ── GameStateService (singleton), IMapDataProvider        │
-├──────────────────────────────────────────────────────────┤
-│  Models  — model danych mapy + stan oznaczeń              │
-│  ── City, Route, MapData, RouteState,                     │
-│     CityMarkState, WagonColor                             │
-└──────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│  Pages — widoki, gesty, rendering                              │
+│  ── MainMenuPage, MapPage, SettingsPage, DeveloperPage         │
+├───────────────────────────────────────────────────────────────┤
+│  PageModels (MVVM) — stan widoku, komendy                      │
+│  ── MainMenuPageModel, MapPageModel, SettingsPageModel,        │
+│     DeveloperPageModel                                         │
+├───────────────────────────────────────────────────────────────┤
+│  Services — logika rozgrywki i edycji danych w pamięci         │
+│  ── GameStateService, IMapDataProvider, ICityNameCatalog,      │
+│     IDeveloperMapEditor, IMapDataExporter                      │
+├───────────────────────────────────────────────────────────────┤
+│  Models — model danych mapy + stan oznaczeń                    │
+│  ── City, Route, MapData, RouteState,                          │
+│     CityMarkState, WagonColor                                  │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ### 3.1 Warstwa modeli (`Models/`)
 
-Czysta definicja danych, bez logiki UI:
-
-- **`MapData`** — kontener: `IReadOnlyList<City>`, `IReadOnlyList<Route>` oraz `CanvasSize` (zakres przestrzeni mapy). Reprezentuje jeden, stały układ planszy (2.1).
-- **`City`** — `Id`, pozycja na mapie (`X`, `Y` w przestrzeni mapy).
-- **`Route`** — `Id`, `CityFromId`, `CityToId` oraz **ścieżka trasy** (łamana punktów w przestrzeni mapy); liczba wagonów (`WagonCount`) wynika z długości tej ścieżki (2.4).
-- **Stan oznaczeń** (osobno od danych bazowych mapy, bo resetowalny):
-  - **`RouteState`** (enum) — `None` → `Selected` (zaznaczona/planowana) → `Done` (wykonana) → `None`; cykl 3-klikowy (2.3).
-  - **`CityMarkState`** — oznaczenie miasta jako toggle bool (2.3).
+- **`MapData`** — kontener: `IReadOnlyList<City>`, `IReadOnlyList<Route>`, `CanvasSize`. Jeden, stały układ planszy (2.1).
+- **`City`** — `Id`, `Name` (nazwa wyświetlana — wyszukiwanie 2.7, tryb deweloperski 2.8), pozycja `X`/`Y`.
+- **`Route`** — `Id`, `CityFromId`, `CityToId`, ścieżka (łamana punktów); `WagonCount` z długości ścieżki (2.4).
+- **Stan oznaczeń** (osobno od danych bazowych, bo resetowalny): `RouteState` (`None → Selected → Done`,
+  cykl 3-klikowy, 2.3), `CityMarkState` (toggle, 2.3).
 - **`WagonColor`** (enum) — paleta gracza: `Czarny, Czerwony, Niebieski, Zielony, Żółty` (2.5).
 
-> Stan oznaczeń (`RouteState`/`CityMarkState`) trzymany jest w `GameStateService`, a **nie** w obiektach
-> `Route`/`City`, aby dane bazowe mapy pozostały niemutowalne i by „reset" sprowadzał się do wyczyszczenia
-> słowników stanu.
+> Stan oznaczeń trzymany jest w `GameStateService`, **nie** w `Route`/`City`, aby dane bazowe mapy
+> pozostały niemutowalne. Robocze listy trybu deweloperskiego (2.8) to osobne, mutowalne kopie
+> `City`/`Route` — nie wpływają na `MapData` używane w standardowym trybie mapy.
 
 ### 3.2 Warstwa serwisów (`Services/`)
 
-- **`IMapDataProvider` / `MapDataProvider`** — dostarcza statyczną `MapData` (miasta + trasy). Na tym etapie
-  może zwracać dane zaślepkowe; docelowo wczyta dane z fizycznej gry (spec. 4). Rejestrowany jako singleton.
-- **`GameStateService`** (singleton, **serce aplikacji**) — trzyma **w pamięci** cały zmienny stan rozgrywki:
-  - słownik stanów tras (`RouteId → RouteState`),
-  - zbiór oznaczonych miast (`HashSet<CityId>`),
-  - aktualny `WagonColor` gracza,
-  - wyliczane liczniki: suma wagonów z tras **wykonanych** i z tras **zaznaczonych** (2.4).
-  - Metody: `ToggleCity(id)`, `CycleRoute(id)` (None→Selected→Done→None), `SetWagonColor(color)`,
-    `ResetGame()` (czyści wszystkie oznaczenia — „Nowa rozgrywka", 2.5).
-  - Eksponuje zdarzenia/`INotifyPropertyChanged`, by page-modele reagowały na zmiany.
-  - **Konstruktor nie ładuje żadnego zapisanego stanu** — gwarancja czystego startu (3.2).
+- **`IMapDataProvider`** — dostarcza statyczną `MapData` z `mapa.json` (singleton).
+- **`ICityNameCatalog`** — stała, wbudowana lista nazw miast z fizycznej gry; źródło podpowiedzi
+  zarówno dla wyszukiwania (2.7), jak i dodawania miast w trybie deweloperskim (2.8).
+- **`GameStateService`** (singleton) — w pamięci: oznaczone miasta, stany tras, `WagonColor`,
+  wyliczane liczniki wagonów (2.4). Metody: `ToggleCity`, `CycleRoute`, `SetWagonColor`, `ResetGame`.
+  Konstruktor nie ładuje zapisanego stanu (3.2).
+- **`IDeveloperMapEditor`** — robocze listy miast/tras trybu deweloperskiego; przy starcie
+  inicjalizowane danymi z `IMapDataProvider`. Operacje: dodaj/edytuj/usuń miasto, dodaj/edytuj/usuń
+  trasę (2.8).
+- **`IMapDataExporter`** — serializuje robocze listy `IDeveloperMapEditor` do formatu zgodnego z
+  `mapa.json` i kopiuje wynik do schowka (`Clipboard`, MAUI Essentials) (2.8).
 
 ### 3.3 Warstwa page-modeli (`PageModels/`)
 
-- **`MapPageModel`** — projekcja stanu z `GameStateService` na widok mapy; komendy `ToggleCityCommand`,
-  `CycleRouteCommand`; właściwości liczników (np. `"12 / 45"` — 2.4); komenda nawigacji do ustawień.
-- **`SettingsPageModel`** — komenda `ResetGameCommand` (bez potwierdzenia — 2.5), wybór koloru wagonów
-  (`SelectWagonColorCommand`, lista predefiniowanej palety).
+- **`MainMenuPageModel`** — komendy nawigacji do trybu mapy i trybu deweloperskiego.
+- **`MapPageModel`** — projekcja `GameStateService`; `ToggleCityCommand`, `CycleRouteCommand`;
+  liczniki (2.4); pole i podpowiedzi wyszukiwania miasta z `ICityNameCatalog`, komenda
+  `SelectSearchResultCommand` (zoom-to-city + oznaczenie, 2.7); nawigacja do ustawień.
+- **`SettingsPageModel`** — `ResetGameCommand` (bez potwierdzenia — 2.5), wybór koloru wagonów.
+- **`DeveloperPageModel`** — robocze listy miast/tras z `IDeveloperMapEditor`; komendy dodawania
+  (wskazanie punktu na mapie + formularz danych), edycji, usuwania oraz `ExportToClipboardCommand`.
 
 ### 3.4 Warstwa widoków (`Pages/`)
 
-- **`MapPage`** — wyświetla planszę z obsługą gestów **pinch-to-zoom** i **pan** (2.1); domyślnie cała plansza
-  „z lotu ptaka" (2.1); klikalne miasta i trasy; nakładka z licznikami; przycisk/ikona przejścia do ustawień.
-  Rendering mapy: **pojedyncza kontrolka `GraphicsView` (`Microsoft.Maui.Graphics`)** rysująca całą planszę
-  wektorowo w jednym `IDrawable`, opakowana we własną kontrolkę mapy — szczegóły w
-  [renderowanie-mapy.md](renderowanie-mapy.md).
-- **`SettingsPage`** — przyciski „Nowa rozgrywka" i wybór koloru wagonów z palety (2.5).
+- **`MainMenuPage`** — wybór trybu: mapa / tryb deweloperski.
+- **`MapPage`** — plansza z gestami **pinch-to-zoom** i **pan** (2.1), pole wyszukiwania miasta
+  z listą podpowiedzi (2.7), nakładka z licznikami, przejście do ustawień. Rendering: `GraphicsView`
+  jak w [renderowanie-mapy.md](renderowanie-mapy.md).
+- **`SettingsPage`** — „Nowa rozgrywka" i wybór koloru wagonów (2.5).
+- **`DeveloperPage`** — ta sama kontrolka mapy jako podkład do wskazywania punktów (bez oznaczania
+  miast/tras ze standardowego trybu), listy robocze miast/tras z formularzami dodania/edycji,
+  przycisk kopiowania danych do schowka (2.8).
 
 ---
 
@@ -116,25 +108,27 @@ Czysta definicja danych, bez logiki UI:
 
 | Ekran | Page / PageModel | Zawartość | Źródło wymagań |
 |---|---|---|---|
-| **Widok mapy** | `MapPage` / `MapPageModel` | Plansza (miasta + trasy), gesty zoom/pan, oznaczanie miast (toggle) i tras (cykl 3-klikowy), liczniki wagonów (wykonane/zaznaczone), wejście do ustawień. | 2.1, 2.3, 2.4 |
-| **Widok ustawień / działań** | `SettingsPage` / `SettingsPageModel` | „Nowa rozgrywka" (reset bez potwierdzenia), zmiana koloru wagonów z palety. | 2.5 |
+| **Główne menu** | `MainMenuPage` / `MainMenuPageModel` | Wybór trybu: mapa gry / tryb deweloperski. | 2.8 |
+| **Widok mapy** | `MapPage` / `MapPageModel` | Plansza, gesty zoom/pan, oznaczanie miast/tras, liczniki, wyszukiwanie miasta, wejście do ustawień. | 2.1, 2.3, 2.4, 2.7 |
+| **Widok ustawień / działań** | `SettingsPage` / `SettingsPageModel` | „Nowa rozgrywka", zmiana koloru wagonów. | 2.5 |
+| **Tryb deweloperski** | `DeveloperPage` / `DeveloperPageModel` | Robocze listy miast/tras, dodawanie przez wskazanie na mapie + formularz, edycja/usuwanie, eksport JSON. | 2.8 |
 
-Dwa ekrany — zgodnie z 3.4 brak ekranu pomocy/onboardingu.
+Brak ekranu pomocy/onboardingu (3.4).
 
 ---
 
 ## 5. Nawigacja
 
-- **Mechanizm:** .NET MAUI Shell (zachowany z szablonu), ale **uproszczony**.
-- Rezygnujemy z `Shell.FlyoutBehavior="Flyout"` i 3 zakładek szablonu.
-- **Model nawigacji:** `MapPage` jest ekranem głównym (root). Przejście do `SettingsPage` odbywa się przez
-  **jawną akcję nawigacyjną** — ikonę/przycisk „menu/ustawienia" w widoku mapy (`Shell.Current.GoToAsync("settings")`),
-  zgodnie z 2.5 (akcje destrukcyjne nie są dostępne bezpośrednio z mapy). Powrót — standardowym „wstecz".
-- Rejestracja trasy `settings` w `MauiProgram.cs`; `MapPage` jako `ShellContent` startowy.
-- Brak `FlyoutFooter` z przełącznikiem motywu.
+- **Mechanizm:** .NET MAUI Shell, `Shell.FlyoutBehavior="Disabled"`.
+- **Model nawigacji:** `MainMenuPage` jest ekranem głównym (root) z wyborem trybu. `SettingsPage`
+  dostępny wyłącznie z `MapPage` przez jawną akcję nawigacyjną (2.5 — akcje destrukcyjne nie są
+  dostępne bezpośrednio z mapy).
 
 ```
-MapPage (root, "//map")
+MainMenuPage (root, "//menu")
+   │  GoToAsync("map")            │  GoToAsync("developer")
+   ▼                              ▼
+MapPage ("map")                DeveloperPage ("developer")
    │  GoToAsync("settings")
    ▼
 SettingsPage ("settings")  ──(wstecz)──►  MapPage
@@ -146,22 +140,22 @@ SettingsPage ("settings")  ──(wstecz)──►  MapPage
 
 | Wymaganie | Realizacja w architekturze |
 |---|---|
-| **3.1 Offline** | Brak warstwy sieciowej; wszystkie dane (mapa) wbudowane / w pamięci. |
-| **3.2 Brak trwałości** | Usunięcie SQLite i całej warstwy `Data/`; `GameStateService` jako stan ulotny w pamięci; brak `Preferences` dla stanu gry; czysta mapa przy każdym starcie. |
-| **3.3 Tylko landscape** | Wymuszenie na platformach: Android — `[Activity(ScreenOrientation = ScreenOrientation.Landscape)]` w `MainActivity`; iOS — `UISupportedInterfaceOrientations` w `Info.plist` ograniczone do `LandscapeLeft`/`LandscapeRight`. |
-| **2.6 Język polski** | Teksty UI po polsku, bez lokalizacji/`.resx`. Nazewnictwo enumów koloru zgodne z polską paletą. |
+| **3.1 Offline** | Brak warstwy sieciowej; wszystkie dane (mapa, katalog nazw miast) wbudowane / w pamięci. |
+| **3.2 Brak trwałości** | `GameStateService` i `IDeveloperMapEditor` jako stan ulotny w pamięci; eksport danych trybu deweloperskiego jest jedyną formą „zapisu" (ręczna, przez schowek). |
+| **3.3 Tylko landscape** | Wymuszenie na platformach: Android — `MainActivity`; iOS — `Info.plist`. |
+| **2.6 Język polski** | Teksty UI po polsku, bez lokalizacji/`.resx`. |
 | **3.4 Brak pomocy/onboardingu** | Brak ekranu pomocy w liście ekranów i w nawigacji. |
-| **3.5 Brak undo** | `GameStateService` nie utrzymuje historii akcji; korekta wyłącznie przez ponowne kliknięcia w cyklu. |
+| **3.5 Brak undo** | Brak historii akcji w `GameStateService`; w trybie deweloperskim korekta przez edycję/usunięcie pozycji z listy. |
 
 ---
 
-## 7. Docelowa struktura katalogów (po sprzątnięciu szablonu)
+## 7. Docelowa struktura katalogów
 
 ```
 src/Aplication/
-├── App.xaml / App.xaml.cs              (zachowane, oczyszczone)
-├── AppShell.xaml / .cs                 (uproszczone: 2 ekrany, bez flyout/motywu)
-├── MauiProgram.cs                      (przebudowane rejestracje DI)
+├── App.xaml / App.xaml.cs
+├── AppShell.xaml / .cs                 (menu, mapa, ustawienia, tryb deweloperski)
+├── MauiProgram.cs
 ├── GlobalUsings.cs
 ├── Models/
 │   ├── MapData.cs
@@ -171,20 +165,24 @@ src/Aplication/
 │   ├── RouteState.cs
 │   └── WagonColor.cs
 ├── Services/
-│   ├── IMapDataProvider.cs
-│   ├── MapDataProvider.cs
-│   └── GameStateService.cs
+│   ├── IMapDataProvider.cs / MapDataProvider.cs
+│   ├── ICityNameCatalog.cs / CityNameCatalog.cs
+│   ├── GameStateService.cs
+│   ├── IDeveloperMapEditor.cs / DeveloperMapEditor.cs
+│   └── IMapDataExporter.cs / MapDataExporter.cs
 ├── PageModels/
+│   ├── MainMenuPageModel.cs
 │   ├── MapPageModel.cs
-│   └── SettingsPageModel.cs
+│   ├── SettingsPageModel.cs
+│   └── DeveloperPageModel.cs
 ├── Pages/
+│   ├── MainMenuPage.xaml / .cs
 │   ├── MapPage.xaml / .cs
 │   ├── SettingsPage.xaml / .cs
-│   └── Controls/                       (własne kontrolki mapy — wg etapu UI)
+│   ├── DeveloperPage.xaml / .cs
+│   └── Controls/                       (m.in. kontrolka mapy — wg renderowania)
 ├── Resources/
-│   ├── Styles/  (Colors.xaml, Styles.xaml — oczyszczone)
-│   ├── Fonts/   (tylko realnie używane)
-│   ├── AppIcon/, Splash/
-│   └── Raw/     (ewentualne dane/grafika mapy)
+│   ├── Styles/, Fonts/, AppIcon/, Splash/
+│   └── Raw/     (mapa.json, podkład graficzny, katalog nazw miast)
 └── Platforms/   (Android, iOS, MacCatalyst, Windows — z wymuszeniem landscape)
 ```

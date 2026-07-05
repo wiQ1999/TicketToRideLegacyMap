@@ -3,83 +3,34 @@
 Aplikacja-towarzysz do gry "Wsiąść do pociągu: Legacy - Legendy zachodu".
 Technologia bazowa: **.NET MAUI** (projekt `src/Aplication`), platformy docelowe Android i iOS.
 
-Specyfikacja źródłowa: [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md).
-
-Stan wyjściowy: projekt zawiera przykładowy szablon MAUI (aplikacja do zarządzania
-projektami/zadaniami — `MainPage`, `ProjectListPage`, `TaskDetailPage`, repozytoria
-w `Data/`, modele `Project`/`Task`/`Category`/`Tag`, `SeedData.json`). Szablon trzeba
-usunąć i zastąpić aplikacją z dokumentacji.
+Źródła: [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md),
+[docs/architektura.md](architektura.md), [docs/renderowanie-mapy.md](renderowanie-mapy.md).
 
 Legenda trybu agenta: **plan** = analiza/projektowanie bez zmian w kodzie, **edit** = implementacja.
 
 ---
 
 ## Etap 1 — Decyzje techniczne i architektura aplikacji
-**Tryb:** plan
+**Tryb:** plan · **Zrealizowano.**
 
-**Prompt:**
-Na podstawie [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (sekcje 2 i 3)
-przeanalizuj projekt `src/Aplication` (.NET MAUI) i zaproponuj docelową architekturę
-aplikacji-towarzysza. Ustal: strukturę katalogów po usunięciu szablonu, podział na warstwy
-(modele danych mapy, serwis stanu rozgrywki w pamięci, widoki + page-modele wg wzorca MVVM
-obecnego w szablonie), listę ekranów (widok mapy, widok ustawień/działań — sekcja 2.5) oraz
-sposób nawigacji między nimi. Uwzględnij wymagania niefunkcjonalne: brak trwałości danych
-(3.2 — stan tylko w pamięci, czyszczony przy starcie), działanie offline (3.1), wyłącznie
-orientacja landscape (3.3), interfejs tylko po polsku (2.6), brak undo/onboardingu (3.4, 3.5).
-Nie modyfikuj jeszcze kodu — przygotuj opis architektury i listę elementów szablonu do usunięcia.
-
----
-
-## Etap 2 — Projekt sposobu renderowania mapy, tras i miast (etap dodatkowy)
-**Tryb:** plan
-
-**Prompt:**
-Zaprojektuj techniczny sposób wyświetlania grafiki planszy oraz prezentacji tras i miast,
-zgodnie z wymaganiami mapy z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md)
-(sekcja 2.1) oraz interakcji (2.3). Rozstrzygnij i uzasadnij wybór:
-- technologii renderowania mapy w .NET MAUI (np. `GraphicsView`/Microsoft.Maui.Graphics
-  z rysowaniem wektorowym, SkiaSharp, czy warstwa elementów `AbsoluteLayout` nad obrazem tła) —
-  z uwzględnieniem wydajności przy gestach pinch-to-zoom i pan (2.1);
-- modelu współrzędnych mapy i mapowania ich na ekran przy zoomie/przesunięciu;
-- sposobu reprezentacji miast (klikalne punkty, toggle oznaczenia — 2.3) i tras
-  (segmenty/odcinki wagonów jako prostokąty — 2.2, kolor trasy zgodny z grą — 2.1);
-- sposobu rysowania i wizualnego rozróżnienia stanów trasy: domyślny / zaznaczona / wykonana
-  (2.3) oraz oznaczenia miasta;
-- mechanizmu trafień (hit-testing) kliknięć w miasta i trasy przy dowolnym poziomie zoomu;
-- formatu danych wejściowych mapy (lista miast ze współrzędnymi, lista tras z liczbą wagonów
-  i kolorem) tak, by dało się je później wypełnić rzeczywistymi danymi z gry (2.1, sekcja 4).
-Wynikiem jest dokument decyzji projektowych — bez zmian w kodzie.
-
----
+## Etap 2 — Projekt sposobu renderowania mapy, tras i miast
+**Tryb:** plan · **Zrealizowano.**
 
 ## Etap 3 — Usunięcie przykładowego szablonu
-**Tryb:** edit
-
-**Prompt:**
-Usuń z projektu `src/Aplication` wszystkie elementy przykładowego szablonu zarządzania
-projektami/zadaniami, zachowując szkielet aplikacji MAUI zdolny do uruchomienia. Do usunięcia:
-strony i page-modele w `Pages/` i `PageModels/` powiązane z projektami/zadaniami, modele
-domenowe szablonu w `Models/` (Project, Task, Category, Tag, ProjectsTags, IconData,
-CategoryChartData), repozytoria i serwisy w `Data/` (repozytoria, JsonContext, SeedDataService,
-Constants), kontrolki w `Pages/Controls/` specyficzne dla szablonu oraz `Resources/Raw/SeedData.json`.
-Wyczyść rejestracje DI w `MauiProgram.cs`, trasy/elementy w `AppShell.xaml(.cs)` oraz nieaktualne
-`GlobalUsings.cs`. Zachowaj konfigurację platform, czcionki/style bazowe i ikonę. Po usunięciu
-aplikacja musi się kompilować i uruchamiać z pustą stroną startową. Postępuj zgodnie z architekturą
-ustaloną w Etapie 1.
+**Tryb:** edit · **Zrealizowano.**
 
 ---
 
-## Etap 4 — Model danych mapy i dane bazowe (placeholder)
+## Etap 4 — Model danych mapy i wczytywanie
 **Tryb:** edit
 
 **Prompt:**
-Zaimplementuj model danych mapy zgodnie z formatem ustalonym w Etapie 2 i wymaganiami
-z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.1, 2.4): miasta (identyfikator,
-nazwa, współrzędne) oraz trasy (miasta końcowe, liczba wagonów jako wartość stała wbudowana w mapę,
-kolor trasy). Dodaj sposób ładowania danych mapy (np. zasób osadzony) wraz z **tymczasowymi
-danymi placeholder** (kilka miast i tras), ponieważ rzeczywiste dane mapy zostaną dostarczone
-przez zleceniodawcę w późniejszym kroku (sekcja 4). Zadbaj, by struktura umożliwiała późniejsze
-podmienienie placeholdera na pełne dane bez zmian w kodzie renderującym.
+Zaimplementuj model danych mapy zgodnie z [docs/architektura.md](architektura.md) (3.1) i
+[docs/renderowanie-mapy.md](renderowanie-mapy.md) (§6-7): `City` (Id, `Name`, współrzędne),
+`Route` (miasta końcowe, łamana punktów, `WagonCount` z jej długości), `MapData` (rozmiar planszy +
+listy). Dodaj `IMapDataProvider`/`MapDataProvider` wczytujący i walidujący `Resources/Raw/mapa.json`
+(unikalność identyfikatorów, istnienie miast końcowych, zakres współrzędnych). Uwzględnij pole
+`Name` miasta, potrzebne później do wyszukiwania (2.7) i trybu deweloperskiego (2.8).
 
 ---
 
@@ -87,13 +38,12 @@ podmienienie placeholdera na pełne dane bez zmian w kodzie renderującym.
 **Tryb:** edit
 
 **Prompt:**
-Zaimplementuj serwis stanu rozgrywki przechowywany wyłącznie w pamięci, zgodnie z
-[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (3.2 — brak trwałości, czysty stan
-po każdym uruchomieniu). Serwis ma przechowywać: zbiór oznaczonych miast, stan każdej trasy
-(domyślny / zaznaczona / wykonana — 2.3) oraz wybrany kolor wagonów gracza (2.2, 2.5 — paleta:
-czarny, czerwony, niebieski, zielony, żółty). Udostępnij operacje: toggle oznaczenia miasta,
-cykl stanu trasy (zaznaczona → wykonana → reset), reset całej mapy oraz zmianę koloru wagonów.
-Dodaj wyliczane liczniki wagonów dla tras wykonanych i zaznaczonych (2.4). Zarejestruj serwis w DI.
+Zaimplementuj `GameStateService` (singleton, wyłącznie w pamięci — 3.2) zgodnie z
+[docs/architektura.md](architektura.md) (3.2): oznaczone miasta (toggle — 2.3), stan każdej trasy
+(cykl `None → Selected → Done → None` — 2.3), wybrany `WagonColor` (2.2, 2.5 — paleta: czarny,
+czerwony, niebieski, zielony, żółty), wyliczane liczniki wagonów tras wykonanych/zaznaczonych (2.4).
+Operacje: `ToggleCity`, `CycleRoute`, `SetWagonColor`, `ResetGame`. Konstruktor nie ładuje żadnego
+zapisanego stanu. Zarejestruj w DI.
 
 ---
 
@@ -101,26 +51,25 @@ Dodaj wyliczane liczniki wagonów dla tras wykonanych i zaznaczonych (2.4). Zare
 **Tryb:** edit
 
 **Prompt:**
-Zaimplementuj główny widok mapy renderujący planszę, miasta i trasy według decyzji z Etapu 2
-i danych z Etapu 4. Zrealizuj gesty mapowe wymagane w
-[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.1): pinch-to-zoom oraz pan,
-domyślny widok = cała plansza w pomniejszeniu, bez przycisku resetu/wycentrowania (powrót przez
-gest oddalenia). Trasy renderuj z kolorem zgodnym z grą (2.1, 2.2 — wagony jako prostokąty).
-Na tym etapie widok jest tylko do wyświetlania (interakcje w Etapie 7).
+Zaimplementuj kontrolkę mapy (`MapBoardView` + `MapDrawable` + `MapViewport`) renderującą planszę,
+miasta i trasy zgodnie z [docs/renderowanie-mapy.md](renderowanie-mapy.md) (§1-4): jeden `IDrawable`
+w `GraphicsView`, przestrzeń mapy niezależna od ekranu, fit-to-screen jako widok domyślny, gesty
+**pinch-to-zoom** i **pan** (2.1, bez przycisku resetu — powrót przez pinch-out). Renderer ma być
+bezstanowy — stan wizualny (2.3) odpytywany z serwisu w Etapie 7. Na tym etapie widok jest tylko do
+wyświetlania.
 
 ---
 
-## Etap 7 — Interakcje: oznaczanie miast i tras
+## Etap 7 — Serwis stanu interakcji i oznaczanie miast/tras
 **Tryb:** edit
 
 **Prompt:**
-Podepnij interakcje użytkownika do widoku mapy zgodnie z
-[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.3) i serwisem stanu z Etapu 5,
-używając mechanizmu hit-testingu z Etapu 2. Zaimplementuj: oznaczanie miast jako toggle;
-cykl kliknięć trasy (1. zaznaczona → 2. wykonana → 3. reset); możliwość niezależnego
-oznaczania wielu miast i tras jednocześnie. Zapewnij wizualne rozróżnienie stanów trasy
-(zaznaczona vs wykonana) oraz oznaczenia miasta, korzystając z wybranego koloru wagonów gracza.
-Brak funkcji undo (3.5).
+Zaimplementuj `IMapInteractionState`/`MapInteractionState` (oznaczenia miast — toggle, stany tras —
+cykl 3-klikowy) oraz podepnij hit-testing (`MapHitTester`, [renderowanie-mapy.md](renderowanie-mapy.md)
+§5) do gestów `MapBoardView`, zgodnie z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md)
+(2.3): kliknięcie miasta = toggle; kliknięcie trasy = krok w cyklu zaznaczona → wykonana → reset;
+niezależne oznaczanie wielu miast i tras. Zapewnij wizualne rozróżnienie stanów trasy (obrys vs
+wypełnienie, patrz renderowanie-mapy.md §4) z użyciem koloru wagonów gracza. Brak funkcji undo (3.5).
 
 ---
 
@@ -128,58 +77,122 @@ Brak funkcji undo (3.5).
 **Tryb:** edit
 
 **Prompt:**
-Dodaj do widoku mapy podgląd liczników zgodnie z
-[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.4): liczba wagonów z tras
-wykonanych oraz z tras zaznaczonych. Prezentacja w prostej formie liczbowej (np. "12 / 45" —
-wykorzystane / limit gracza), bez paska postępu czy dodatkowej grafiki. Liczniki aktualizują się
-na bieżąco wraz ze zmianami stanu tras (dane z serwisu stanu z Etapu 5).
+Dodaj nakładkę z licznikami nad widokiem mapy zgodnie z
+[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.4): liczba wagonów z tras wykonanych
+oraz zaznaczonych, w prostej formie liczbowej (np. "12 / 45"), bez paska postępu. Liczniki
+aktualizują się na bieżąco na podstawie zdarzeń `GameStateService` (Etap 5).
 
 ---
 
-## Etap 9 — Widok ustawień / działań
+## Etap 9 — Główne menu i nawigacja trybów
 **Tryb:** edit
 
 **Prompt:**
-Zaimplementuj osobny widok ustawień/działań dostępny przez nawigację (nie z poziomu akcji na
-mapie), zgodnie z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.5). Zawartość:
-**Reset mapy / "Nowa rozgrywka"** — czyści wszystkie oznaczenia miast i tras oraz przywraca stan
-domyślny, bez dodatkowego potwierdzenia; **Zmiana koloru wagonów** — wybór z palety: czarny,
-czerwony, niebieski, zielony, żółty. Obie akcje operują na serwisie stanu z Etapu 5 i natychmiast
-odzwierciedlają się na mapie.
+Wprowadź `MainMenuPage`/`MainMenuPageModel` jako ekran startowy (root) zgodnie z
+[docs/architektura.md](architektura.md) (§5): wybór trybu **mapa gry** / **tryb deweloperski**
+(spec. 2.8). Zaktualizuj `AppShell` o trasy `menu` (root), `map`, `developer`, `settings` (ten
+ostatni dostępny wyłącznie z widoku mapy). Przenieś dotychczasową zawartość ekranu startowego do
+`MapPage`.
 
 ---
 
-## Etap 10 — Konfiguracja platformowa: landscape, offline, język
+## Etap 10 — Widok ustawień / działań
+**Tryb:** edit
+
+**Prompt:**
+Zaimplementuj `SettingsPage`/`SettingsPageModel`, dostępny wyłącznie przez nawigację z widoku mapy
+(nie z akcji na mapie), zgodnie z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.5):
+**Reset mapy** ("Nowa rozgrywka") — czyści wszystkie oznaczenia, bez potwierdzenia; **Zmiana koloru
+wagonów** — wybór z palety (czarny, czerwony, niebieski, zielony, żółty). Obie akcje operują na
+`GameStateService` (Etap 5) i natychmiast odzwierciedlają się na mapie.
+
+---
+
+## Etap 11 — Wyszukiwanie miasta
+**Tryb:** edit
+
+**Prompt:**
+Dodaj do widoku mapy pole wyszukiwania miasta zgodnie z
+[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.7): podpowiedzi najbardziej pasujących
+nazw podczas wpisywania (źródło nazw — `ICityNameCatalog`/dane z `MapData`, patrz
+[docs/architektura.md](architektura.md) §3.2); po wyborze miasta z listy — przybliżenie i wycentrowanie
+widoku mapy na tym mieście (rozszerzenie `MapViewport` o programowy zoom-to-point) oraz oznaczenie
+miasta w `GameStateService`, jeśli nie było wcześniej oznaczone (bez odznaczania, gdy już oznaczone).
+Funkcja niedostępna w trybie deweloperskim.
+
+---
+
+## Etap 12 — Tryb deweloperski: szkielet i dodawanie miast
+**Tryb:** edit
+
+**Prompt:**
+Zaimplementuj `DeveloperPage`/`DeveloperPageModel` oraz `IDeveloperMapEditor` zgodnie z
+[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.8) i
+[docs/architektura.md](architektura.md) (§3.2-3.4): przy wejściu w tryb wczytaj istniejące dane mapy
+(`IMapDataProvider`) do roboczych list miast i tras. Widok mapy w tym trybie służy wyłącznie jako
+podkład (bez oznaczania miast/tras ze standardowego trybu). Zaimplementuj dodawanie miasta:
+wskazanie dokładnego położenia na mapie + formularz z nazwą wybieraną z ustalonej, stałej listy
+nazw (`ICityNameCatalog`, z podpowiedziami) oraz edycję i usuwanie pozycji z listy miast.
+
+---
+
+## Etap 13 — Tryb deweloperski: dodawanie i edycja tras
+**Tryb:** edit
+
+**Prompt:**
+Rozszerz tryb deweloperski (Etap 12) o zarządzanie trasami zgodnie z
+[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.8): dodanie trasy przez wskazanie na
+mapie kolejnych punktów wyznaczających jej przebieg pomiędzy dwoma wybranymi miastami z roboczej
+listy oraz uzupełnienie pozostałych danych (m.in. liczby wagonów, wynikającej z liczby odcinków —
+[docs/renderowanie-mapy.md](renderowanie-mapy.md) §3). Dodaj edycję i usuwanie pozycji z roboczej
+listy tras.
+
+---
+
+## Etap 14 — Tryb deweloperski: eksport danych do JSON
+**Tryb:** edit
+
+**Prompt:**
+Zaimplementuj `IMapDataExporter` i podepnij go do `DeveloperPageModel` zgodnie z
+[docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md) (2.8): serializacja roboczych list miast
+i tras z `IDeveloperMapEditor` do formatu zgodnego ze schematem `mapa.json`
+([docs/renderowanie-mapy.md](renderowanie-mapy.md) §6) oraz skopiowanie wyniku do schowka
+systemowego (`Clipboard`, MAUI Essentials) po akcji dewelopera.
+
+---
+
+## Etap 15 — Konfiguracja platformowa: landscape, offline, język
 **Tryb:** edit
 
 **Prompt:**
 Skonfiguruj wymagania niefunkcjonalne z [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md):
-wymuszenie wyłącznie orientacji poziomej (landscape) na Androidzie i iOS (3.3), zapewnienie pełnego
-działania offline bez zależności sieciowych (3.1) oraz interfejs wyłącznie w języku polskim (2.6).
-Zweryfikuj manifesty/pliki konfiguracyjne platform (`Platforms/Android`, `Platforms/iOS`).
-Usuń ewentualne pozostałości po onboardingu/pomocy (3.4).
+wymuszenie wyłącznie orientacji poziomej (landscape) na Androidzie i iOS (3.3), pełne działanie
+offline bez zależności sieciowych (3.1) oraz interfejs wyłącznie w języku polskim (2.6). Zweryfikuj
+manifesty/pliki konfiguracyjne platform (`Platforms/Android`, `Platforms/iOS`). Usuń ewentualne
+pozostałości po onboardingu/pomocy (3.4).
 
 ---
 
-## Etap 11 — Integracja rzeczywistych danych mapy
+## Etap 16 — Integracja rzeczywistych danych mapy
 **Tryb:** edit
 
 **Prompt:**
-Po dostarczeniu przez zleceniodawcę rzeczywistych danych mapy (lista miast, lista tras z liczbą
-wagonów i kolorem — [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md), sekcje 2.1 i 4)
-zastąp dane placeholder z Etapu 4 pełnym układem planszy i dostrój współrzędne miast/tras względem
-grafiki tła. Zweryfikuj poprawność hit-testingu, kolorów tras i liczników na pełnych danych.
+Po dostarczeniu przez zleceniodawcę rzeczywistych danych mapy (lista miast z nazwami, lista tras z
+liczbą wagonów — [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md), sekcje 2.1 i 4) zastąp
+dane placeholder z Etapu 4 pełnym układem planszy i dostrój współrzędne miast/tras względem grafiki
+tła. Uzupełnij `ICityNameCatalog` o pełną, docelową listę nazw miast. Zweryfikuj poprawność
+hit-testingu, wyszukiwania i liczników na pełnych danych.
 *(Etap zależny od dostarczenia danych — realizowany, gdy będą dostępne.)*
 
 ---
 
-## Etap 12 — Testy końcowe i dopracowanie
+## Etap 17 — Testy końcowe i dopracowanie
 **Tryb:** edit
 
 **Prompt:**
 Przeprowadź weryfikację całej aplikacji względem [docs/specyfikacja-aplikacji.md](specyfikacja-aplikacji.md):
-scenariusze oznaczania miast (toggle), pełny cykl stanów tras, poprawność liczników (2.4),
-działanie gestów i domyślnego widoku (2.1), reset mapy i zmianę koloru (2.5), zachowanie braku
-trwałości stanu po restarcie (3.2) oraz wymuszenie landscape (3.3). Popraw znalezione błędy,
-uporządkuj kod i style. Uruchom aplikację na docelowych platformach i potwierdź zgodność z zakresem
-(z pominięciem mechanik wykluczonych w 3.5).
+oznaczanie miast (toggle), pełny cykl stanów tras, liczniki (2.4), gesty i domyślny widok (2.1),
+wyszukiwanie miasta (2.7), reset mapy i zmianę koloru (2.5), tryb deweloperski wraz z eksportem
+JSON (2.8), brak trwałości stanu po restarcie (3.2) oraz wymuszenie landscape (3.3). Popraw
+znalezione błędy, uporządkuj kod i style. Uruchom aplikację na docelowych platformach i potwierdź
+zgodność z zakresem (z pominięciem mechanik wykluczonych w 3.5).
