@@ -29,6 +29,19 @@
                         Command="{Binding SelectRoutesTabCommand}" />
                 </HorizontalStackLayout>
 
+                <BoxView HeightRequest="1" Color="#DDDDDD" />
+
+                <!-- Eksport danych roboczych do schowka (JSON zgodny z mapa.json) -->
+                <Button
+                    Text="Kopiuj dane do schowka (JSON)"
+                    Command="{Binding ExportToClipboardCommand}" />
+                <Label
+                    FontSize="12"
+                    TextColor="#2E7D32"
+                    Text="{Binding ExportStatusMessage}" />
+
+                <BoxView HeightRequest="1" Color="#DDDDDD" />
+
                 <VerticalStackLayout Spacing="12" IsVisible="{Binding IsCitiesTab}">
 
                     <Label

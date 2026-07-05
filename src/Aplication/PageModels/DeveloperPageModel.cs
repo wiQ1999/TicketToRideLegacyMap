@@ -15,12 +15,14 @@ public sealed record DeveloperRouteRow(Route Route, string CityFromName, string 
 /// <see cref="IDeveloperMapEditor"/>. Umożliwia dodawanie miasta (wskazane położenie na mapie + nazwa
 /// z <see cref="ICityNameCatalog"/> z podpowiedziami), edycję i usuwanie miast, a także dodawanie tras
 /// (dwa miasta z listy roboczej + wagoniki wskazywane na mapie parami punktów przekątnej) wraz z edycją
-/// i usuwaniem pojedynczych wagoników oraz całych tras.
+/// i usuwaniem pojedynczych wagoników oraz całych tras. Komplet danych roboczych można skopiować do
+/// schowka w formacie JSON przez <see cref="IMapDataExporter"/>.
 /// </summary>
 public sealed partial class DeveloperPageModel(
     IMapDataProvider mapDataProvider,
     IDeveloperMapEditor editor,
     ICityNameCatalog cityNameCatalog,
+    IMapDataExporter exporter,
     IErrorHandler errorHandler) : ObservableObject
 {
     private const int MaxNameSuggestions = 6;
@@ -112,6 +114,9 @@ public sealed partial class DeveloperPageModel(
     /// <summary>Czy punkt oczekujący na nakładce to róg wagonika (trasy), a nie pozycja miasta.</summary>
     public bool IsOverlayPendingPointWagonCorner => IsRoutesTab;
 
+    [ObservableProperty]
+    private string? _exportStatusMessage;
+
     public async Task InitializeAsync()
     {
         try
@@ -149,6 +154,21 @@ public sealed partial class DeveloperPageModel(
 
     [RelayCommand]
     private void SelectRoutesTab() => IsRoutesTab = true;
+
+    [RelayCommand]
+    private async Task ExportToClipboard()
+    {
+        try
+        {
+            var canvasSize = Map?.CanvasSize ?? default;
+            await exporter.ExportToClipboardAsync(canvasSize, editor.Cities, editor.Routes);
+            ExportStatusMessage = $"Skopiowano do schowka: {editor.Cities.Count} miast, {editor.Routes.Count} tras.";
+        }
+        catch (Exception ex)
+        {
+            errorHandler.HandleError(ex);
+        }
+    }
 
     [RelayCommand]
     private void SelectSuggestion(string name)

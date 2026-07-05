@@ -29,6 +29,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IMapInteractionState, MapInteractionState>();
         builder.Services.AddSingleton<ICityNameCatalog, CityNameCatalog>();
         builder.Services.AddSingleton<IDeveloperMapEditor, DeveloperMapEditor>();
+        builder.Services.AddSingleton<IMapDataExporter, MapDataExporter>();
         builder.Services.AddTransient<MainMenuPageModel>();
         builder.Services.AddTransient<MainMenuPage>();
         builder.Services.AddTransient<MapPage>();
