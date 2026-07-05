@@ -60,6 +60,27 @@ Aplikacja mobilna służąca jako cyfrowy pomocnik podczas rozgrywki w planszow�
 ### 2.6 Język interfejsu
 - Aplikacja dostępna jest w **jednym języku: polskim**. Nie jest wymagana wielojęzyczność / lokalizacja na inne języki.
 
+### 2.7 Wyszukiwanie miasta
+- W standardowym trybie mapy dostępne jest pole wyszukiwania miasta.
+- Podczas wpisywania fragmentu nazwy wyświetlana jest lista podpowiedzi z najbardziej pasującymi nazwami miast dostępnych na planszy.
+- Po wybraniu miasta z listy podpowiedzi:
+  - widok mapy przybliża się (zoom) i centruje na wybranym mieście,
+  - miasto zostaje oznaczone (analogicznie do ręcznego oznaczania miast, patrz 2.3), jeśli nie było ono wcześniej oznaczone. Jeśli miasto było już oznaczone, jego stan oznaczenia nie ulega zmianie.
+- Wyszukiwanie miasta jest funkcją standardowego trybu mapy - nie jest dostępne w trybie deweloperskim (patrz 2.8).
+
+### 2.8 Tryb deweloperski
+- Tryb deweloperski to dodatkowy tryb działania aplikacji, dostępny z menu głównego na równi ze standardowym trybem mapy.
+- Przeznaczenie: ręczne przygotowanie i uzupełnianie danych mapy (miast i tras), które docelowo zostają na stałe wbudowane w aplikację. Nie jest to funkcja przeznaczona dla gracza korzystającego z aplikacji podczas rozgrywki.
+- Po wejściu w tryb deweloperski wczytywane są dane mapy aktualnie dostępne w aplikacji, tworząc dwie listy robocze: listę miast oraz listę tras.
+- W trybie deweloperskim mapa służy wyłącznie jako podkład do wskazywania położenia elementów - funkcje oznaczania miast i tras znane ze standardowego trybu (2.3) są w nim niedostępne.
+- **Zarządzanie miastami:**
+  - Dodanie miasta: deweloper wskazuje na mapie dokładne położenie, a następnie uzupełnia pozostałe dane miasta, wybierając jego nazwę z ustalonej, stałej listy nazw miast (z podpowiedziami podczas wpisywania).
+  - Deweloper może również edytować (np. poprawić położenie lub dane) oraz usuwać pozycje znajdujące się już na liście miast.
+- **Zarządzanie trasami:**
+  - Dodanie trasy: deweloper wskazuje na mapie kolejne punkty wyznaczające przebieg trasy pomiędzy dwoma wybranymi miastami, a następnie uzupełnia pozostałe dane trasy wymagane do zapisania jej modelu (m.in. liczbę wagonów).
+  - Deweloper może również edytować oraz usuwać pozycje znajdujące się już na liście tras.
+- Efektem pracy w trybie deweloperskim jest komplet danych (lista miast i lista tras), który można skopiować w formacie JSON do schowka systemowego, do dalszego ręcznego wykorzystania (np. wklejenia do plików danych aplikacji).
+
 ## 3. Wymagania niefunkcjonalne
 
 ### 3.1 Działanie offline
