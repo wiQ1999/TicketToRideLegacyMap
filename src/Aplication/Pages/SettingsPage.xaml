@@ -3,11 +3,65 @@
     x:Class="Aplication.Pages.SettingsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:Aplication.Models"
     Title="Ustawienia">
 
-    <Label
-        HorizontalOptions="Center"
-        VerticalOptions="Center"
-        Text="Ustawienia — w przygotowaniu." />
+    <VerticalStackLayout
+        Padding="24"
+        Spacing="24">
+
+        <VerticalStackLayout Spacing="8">
+            <Label
+                FontSize="16"
+                FontAttributes="Bold"
+                Text="Nowa rozgrywka" />
+            <Label Text="Czyści wszystkie oznaczenia miast i tras. Bez potwierdzenia." />
+            <Button
+                Text="Resetuj mapę"
+                HorizontalOptions="Start"
+                Command="{Binding ResetGameCommand}" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Spacing="8">
+            <Label
+                FontSize="16"
+                FontAttributes="Bold"
+                Text="Kolor wagonów" />
+            <Label Text="{Binding SelectedColorLabel, StringFormat='Wybrany kolor: {0}'}" />
+            <HorizontalStackLayout Spacing="10">
+                <Button
+                    Text="Czarny"
+                    BackgroundColor="#212121"
+                    TextColor="White"
+                    Command="{Binding SelectColorCommand}"
+                    CommandParameter="{x:Static models:WagonColor.Czarny}" />
+                <Button
+                    Text="Czerwony"
+                    BackgroundColor="#C62828"
+                    TextColor="White"
+                    Command="{Binding SelectColorCommand}"
+                    CommandParameter="{x:Static models:WagonColor.Czerwony}" />
+                <Button
+                    Text="Niebieski"
+                    BackgroundColor="#1565C0"
+                    TextColor="White"
+                    Command="{Binding SelectColorCommand}"
+                    CommandParameter="{x:Static models:WagonColor.Niebieski}" />
+                <Button
+                    Text="Zielony"
+                    BackgroundColor="#2E7D32"
+                    TextColor="White"
+                    Command="{Binding SelectColorCommand}"
+                    CommandParameter="{x:Static models:WagonColor.Zielony}" />
+                <Button
+                    Text="Żółty"
+                    BackgroundColor="#F9A825"
+                    TextColor="Black"
+                    Command="{Binding SelectColorCommand}"
+                    CommandParameter="{x:Static models:WagonColor.Zolty}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+    </VerticalStackLayout>
 
 </ContentPage>

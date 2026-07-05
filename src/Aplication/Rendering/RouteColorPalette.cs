@@ -1,10 +1,15 @@
 namespace Aplication.Rendering;
 
-/// <summary>
-/// Kolor wagonów gracza używany do rysowania tras zaznaczonych i wykonanych. Trzymany w jednym
-/// miejscu — docelowo sterowany wyborem koloru gracza; na razie stała wartość.
-/// </summary>
+/// <summary>Odwzorowanie palety koloru wagonów gracza (<see cref="WagonColor"/>) na kolor ekranowy.</summary>
 public static class RouteColorPalette
 {
-    public static readonly Color Player = Color.FromArgb("#2E7D32");
+    public static Color ToColor(WagonColor color) => color switch
+    {
+        WagonColor.Czarny => Color.FromArgb("#212121"),
+        WagonColor.Czerwony => Color.FromArgb("#C62828"),
+        WagonColor.Niebieski => Color.FromArgb("#1565C0"),
+        WagonColor.Zielony => Color.FromArgb("#2E7D32"),
+        WagonColor.Zolty => Color.FromArgb("#F9A825"),
+        _ => Color.FromArgb("#212121")
+    };
 }

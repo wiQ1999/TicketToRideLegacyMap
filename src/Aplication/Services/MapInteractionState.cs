@@ -11,6 +11,8 @@ public sealed class MapInteractionState : IMapInteractionState
 
     public event EventHandler? Changed;
 
+    public WagonColor WagonColor { get; private set; } = PickRandomColor();
+
     public bool IsCityMarked(string cityId) => _markedCities.Contains(cityId);
 
     public void ToggleCity(string cityId)
@@ -38,5 +40,24 @@ public sealed class MapInteractionState : IMapInteractionState
         RaiseChanged();
     }
 
+    public void SetWagonColor(WagonColor color)
+    {
+        WagonColor = color;
+        RaiseChanged();
+    }
+
+    public void ResetMarks()
+    {
+        _markedCities.Clear();
+        _routeStates.Clear();
+        RaiseChanged();
+    }
+
     private void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
+
+    private static WagonColor PickRandomColor()
+    {
+        var values = Enum.GetValues<WagonColor>();
+        return values[Random.Shared.Next(values.Length)];
+    }
 }

@@ -46,6 +46,9 @@ public partial class MapPage : ContentPage
 
     private void OnInteractionStateChanged(object? sender, EventArgs e) => UpdateCounters();
 
+    private void OnSettingsClicked(object? sender, EventArgs e) =>
+        Shell.Current.GoToAsync("settings").FireAndForgetSafeAsync(_errorHandler);
+
     private void UpdateCounters()
     {
         if (_map is null)

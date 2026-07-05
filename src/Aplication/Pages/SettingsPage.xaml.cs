@@ -2,8 +2,9 @@ namespace Aplication.Pages;
 
 public partial class SettingsPage : ContentPage
 {
-    public SettingsPage()
+    public SettingsPage(SettingsPageModel pageModel)
     {
         InitializeComponent();
+        BindingContext = pageModel;
     }
 }

@@ -75,17 +75,19 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
         path.Close();
 
+        var playerColor = RouteColorPalette.ToColor(state.WagonColor);
+
         if (routeState == RouteState.Done)
         {
             // Wykonana: pełne wypełnienie kolorem wagonów gracza.
-            canvas.FillColor = RouteColorPalette.Player;
+            canvas.FillColor = playerColor;
             canvas.FillPath(path);
         }
         else
         {
             // Zaznaczona: sam obrys kolorem wagonów gracza, wnętrze przezroczyste — inny kanał
             // wizualny niż wypełnienie, więc rozróżnialne także przy zaburzeniach widzenia barw.
-            canvas.StrokeColor = RouteColorPalette.Player;
+            canvas.StrokeColor = playerColor;
             canvas.StrokeSize = 3f;
             canvas.DrawPath(path);
         }

@@ -2,14 +2,18 @@ namespace Aplication.Services;
 
 /// <summary>
 /// Trzyma zmienny stan interakcji nałożony na niemutowalną mapę bazową: oznaczenia miast
-/// (toggle) oraz stany tras (cykl <see cref="RouteState"/>). Renderer odpytuje ten serwis
-/// przy każdym rysowaniu — sam nie przechowuje stanu. Zmiana stanu zgłaszana jest przez
-/// <see cref="Changed"/>, na które reaguje widok, wywołując ponowne rysowanie.
+/// (toggle), stany tras (cykl <see cref="RouteState"/>) i wybrany kolor wagonów gracza.
+/// Renderer odpytuje ten serwis przy każdym rysowaniu — sam nie przechowuje stanu. Zmiana
+/// stanu zgłaszana jest przez <see cref="Changed"/>, na które reaguje widok, wywołując
+/// ponowne rysowanie.
 /// </summary>
 public interface IMapInteractionState
 {
-    /// <summary>Zgłaszane po każdej zmianie stanu (toggle miasta lub cykl trasy).</summary>
+    /// <summary>Zgłaszane po każdej zmianie stanu (toggle miasta, cykl trasy, kolor, reset).</summary>
     event EventHandler? Changed;
+
+    /// <summary>Aktualnie wybrany kolor wagonów gracza.</summary>
+    WagonColor WagonColor { get; }
 
     /// <summary>Czy miasto jest oznaczone.</summary>
     bool IsCityMarked(string cityId);
@@ -22,4 +26,10 @@ public interface IMapInteractionState
 
     /// <summary>Przechodzi trasę o krok w cyklu None→Selected→Done→None i zgłasza <see cref="Changed"/>.</summary>
     void CycleRoute(string routeId);
+
+    /// <summary>Ustawia kolor wagonów gracza i zgłasza <see cref="Changed"/>.</summary>
+    void SetWagonColor(WagonColor color);
+
+    /// <summary>Czyści wszystkie oznaczenia miast oraz stany tras i zgłasza <see cref="Changed"/>.</summary>
+    void ResetMarks();
 }
