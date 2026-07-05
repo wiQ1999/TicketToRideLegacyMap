@@ -10,7 +10,7 @@ public sealed class CityNameCatalog : ICityNameCatalog
     [
         "Albany", "Atlanta", "Baja", "Baltimore", "Bangor", "Boston", "Buffalo", "Calgary",
         "Cemetery City", "Charleston", "Charlotte", "Cheyenne", "Chicago", "Chihuahua", "Cincinnati",
-        "Dallas", "Davenport", "Denver", "Dodge City", "Duluth", "El Paso", "Fargo", "Helena",
+        "Dallas", "Davenport", "Denver", "Detroit", "Dodge City", "Duluth", "El Paso", "Fargo", "Helena",
         "Hermosillo", "Houston", "Jacksonville", "Kansas City", "Knoxville", "Lewisburg", "Little Rock",
         "Miami", "Miles City", "Mobile", "Monterrey", "Montreal", "Nashville", "New Orleans", "New York",
         "Nuevos Angeles", "Oklahoma City", "Omaha", "Pacific Haven", "Philadelphia", "Phoenix",

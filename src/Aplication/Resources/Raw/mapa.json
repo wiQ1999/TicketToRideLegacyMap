@@ -1,72 +1,71 @@
 {
-  "canvasSize": { "width": 168, "height": 283 },
+  "canvasSize": { "width": 1448, "height": 1086 },
 
-  "_comment": "PoC interakcji: wspolrzedne wytrasowane z docs/map_background_test_sample.png (przestrzen mapy = piksele podkladu 168x283). Trasa = lista wagonikow 'wagons', kazdy to kwadrat opisany dwoma przeciwleglymi rogami przekatnej 'a'/'b' (pozostale 2 rogi wyliczane przy zalozeniu katow prostych, wagonik moze byc obrocony pod dowolnym katem).",
+  "_comment": "Etap 16: pelny uklad planszy fizycznej gry, wspolrzedne wytrasowane z docs/map_background.png (przestrzen mapy = piksele podkladu 1448x1086). Pozycje miast to przyblizenie wizualne (do doprecyzowania w trybie deweloperskim); trasy celowo puste - dodawane w kolejnym etapie w trybie deweloperskim. Boston i Bangor nie sa jeszcze widoczne na tym zdjeciu planszy (zaslaniaja je nierozpieczetowane elementy Legacy) - dodac po ich ujawnieniu.",
 
   "cities": [
-    { "id": "DUL", "name": "Duluth", "x": 21, "y": 45 },
-    { "id": "DAV", "name": "Davenport", "x": 146, "y": 23 },
-    { "id": "STL", "name": "St. Louis", "x": 133, "y": 106 },
-    { "id": "KAN", "name": "Kansas City", "x": 145, "y": 229 },
-    { "id": "OMA", "name": "Omaha", "x": 76, "y": 262 }
+    { "id": "VAN", "name": "Vancouver", "x": 114, "y": 58 },
+    { "id": "CAL", "name": "Calgary", "x": 332, "y": 48 },
+    { "id": "SEA", "name": "Seattle", "x": 114, "y": 149 },
+    { "id": "POR", "name": "Portland", "x": 80, "y": 236 },
+    { "id": "SPO", "name": "Spokane", "x": 248, "y": 231 },
+    { "id": "HEL", "name": "Helena", "x": 336, "y": 224 },
+    { "id": "REG", "name": "Regina", "x": 555, "y": 58 },
+    { "id": "WIN", "name": "Winnipeg", "x": 718, "y": 80 },
+    { "id": "MIL", "name": "Miles City", "x": 533, "y": 185 },
+    { "id": "FAR", "name": "Fargo", "x": 731, "y": 206 },
+    { "id": "DUL", "name": "Duluth", "x": 859, "y": 185 },
+    { "id": "STP", "name": "St. Paul", "x": 848, "y": 269 },
+    { "id": "QUE", "name": "Quebec", "x": 1356, "y": 48 },
+    { "id": "MTR", "name": "Montreal", "x": 1314, "y": 108 },
+    { "id": "BUF", "name": "Buffalo", "x": 1204, "y": 197 },
+    { "id": "DET", "name": "Detroit", "x": 1093, "y": 265 },
+    { "id": "ALB", "name": "Albany", "x": 1314, "y": 196 },
+    { "id": "CHI", "name": "Chicago", "x": 994, "y": 348 },
+    { "id": "PIT", "name": "Pittsburgh", "x": 1189, "y": 339 },
+    { "id": "NYC", "name": "New York", "x": 1384, "y": 250 },
+    { "id": "PHI", "name": "Philadelphia", "x": 1384, "y": 328 },
+    { "id": "SAC", "name": "Sacramento", "x": 99, "y": 466 },
+    { "id": "SFO", "name": "San Francisco", "x": 43, "y": 530 },
+    { "id": "CEM", "name": "Cemetery City", "x": 179, "y": 466 },
+    { "id": "PAC", "name": "Pacific Haven", "x": 30, "y": 666 },
+    { "id": "NUE", "name": "Nuevos Angeles", "x": 153, "y": 670 },
+    { "id": "BAJ", "name": "Baja", "x": 188, "y": 731 },
+    { "id": "SLC", "name": "Salt Lake City", "x": 353, "y": 438 },
+    { "id": "PHX", "name": "Phoenix", "x": 369, "y": 681 },
+    { "id": "CHE", "name": "Cheyenne", "x": 571, "y": 408 },
+    { "id": "DEN", "name": "Denver", "x": 544, "y": 489 },
+    { "id": "OMA", "name": "Omaha", "x": 791, "y": 426 },
+    { "id": "DAV", "name": "Davenport", "x": 907, "y": 400 },
+    { "id": "KAN", "name": "Kansas City", "x": 821, "y": 499 },
+    { "id": "DOD", "name": "Dodge City", "x": 712, "y": 563 },
+    { "id": "OKC", "name": "Oklahoma City", "x": 766, "y": 627 },
+    { "id": "SFE", "name": "Santa Fe", "x": 498, "y": 649 },
+    { "id": "CIN", "name": "Cincinnati", "x": 1039, "y": 413 },
+    { "id": "LEW", "name": "Lewisburg", "x": 1226, "y": 409 },
+    { "id": "BAL", "name": "Baltimore", "x": 1333, "y": 425 },
+    { "id": "NRF", "name": "Norfolk", "x": 1376, "y": 455 },
+    { "id": "KNO", "name": "Knoxville", "x": 1109, "y": 517 },
+    { "id": "CLT", "name": "Charlotte", "x": 1220, "y": 554 },
+    { "id": "STL", "name": "St. Louis", "x": 929, "y": 484 },
+    { "id": "NAS", "name": "Nashville", "x": 1009, "y": 585 },
+    { "id": "ATL", "name": "Atlanta", "x": 1133, "y": 613 },
+    { "id": "CHS", "name": "Charleston", "x": 1297, "y": 622 },
+    { "id": "SAV", "name": "Savannah", "x": 1297, "y": 688 },
+    { "id": "LIT", "name": "Little Rock", "x": 940, "y": 655 },
+    { "id": "HER", "name": "Hermosillo", "x": 375, "y": 899 },
+    { "id": "ELP", "name": "El Paso", "x": 528, "y": 781 },
+    { "id": "DAL", "name": "Dallas", "x": 790, "y": 749 },
+    { "id": "CHH", "name": "Chihuahua", "x": 488, "y": 919 },
+    { "id": "SAT", "name": "San Antonio", "x": 743, "y": 870 },
+    { "id": "HOU", "name": "Houston", "x": 866, "y": 864 },
+    { "id": "MTY", "name": "Monterrey", "x": 641, "y": 969 },
+    { "id": "MOB", "name": "Mobile", "x": 1070, "y": 759 },
+    { "id": "NOL", "name": "New Orleans", "x": 1017, "y": 819 },
+    { "id": "JAX", "name": "Jacksonville", "x": 1286, "y": 769 },
+    { "id": "TAM", "name": "Tampa", "x": 1273, "y": 861 },
+    { "id": "MIA", "name": "Miami", "x": 1336, "y": 888 }
   ],
 
-  "routes": [
-    {
-      "id": "DUL-DAV", "from": "DUL", "to": "DAV",
-      "wagons": [
-        { "a": { "x": 48, "y": 37 }, "b": { "x": 89, "y": 31 } },
-        { "a": { "x": 89, "y": 31 }, "b": { "x": 130, "y": 25 } }
-      ]
-    },
-    {
-      "id": "STL-DAV", "from": "STL", "to": "DAV",
-      "wagons": [
-        { "a": { "x": 144, "y": 43 }, "b": { "x": 136, "y": 86 } }
-      ]
-    },
-    {
-      "id": "DUL-STL-1", "from": "DUL", "to": "STL",
-      "wagons": [
-        { "a": { "x": 51, "y": 45 }, "b": { "x": 80, "y": 77 } },
-        { "a": { "x": 89, "y": 65 }, "b": { "x": 117, "y": 96 } }
-      ]
-    },
-    {
-      "id": "DUL-STL-2", "from": "DUL", "to": "STL",
-      "wagons": [
-        { "a": { "x": 41, "y": 67 }, "b": { "x": 78, "y": 86 } },
-        { "a": { "x": 78, "y": 86 }, "b": { "x": 114, "y": 106 } }
-      ]
-    },
-    {
-      "id": "STL-OMA-1", "from": "STL", "to": "OMA",
-      "wagons": [
-        { "a": { "x": 100, "y": 115 }, "b": { "x": 80, "y": 149 } },
-        { "a": { "x": 80, "y": 149 }, "b": { "x": 65, "y": 192 } },
-        { "a": { "x": 65, "y": 192 }, "b": { "x": 63, "y": 238 } }
-      ]
-    },
-    {
-      "id": "STL-OMA-2", "from": "STL", "to": "OMA",
-      "wagons": [
-        { "a": { "x": 117, "y": 119 }, "b": { "x": 95, "y": 155 } },
-        { "a": { "x": 95, "y": 155 }, "b": { "x": 82, "y": 198 } },
-        { "a": { "x": 82, "y": 198 }, "b": { "x": 78, "y": 243 } }
-      ]
-    },
-    {
-      "id": "STL-KAN", "from": "STL", "to": "KAN",
-      "wagons": [
-        { "a": { "x": 132, "y": 125 }, "b": { "x": 127, "y": 170 } },
-        { "a": { "x": 127, "y": 170 }, "b": { "x": 139, "y": 213 } }
-      ]
-    },
-    {
-      "id": "OMA-KAN", "from": "OMA", "to": "KAN",
-      "wagons": [
-        { "a": { "x": 91, "y": 252 }, "b": { "x": 129, "y": 236 } }
-      ]
-    }
-  ]
+  "routes": []
 }
