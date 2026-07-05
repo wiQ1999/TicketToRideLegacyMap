@@ -8,8 +8,10 @@ Aplikacja-towarzysz (.NET MAUI) do gry planszowej **„Wsiąść do pociągu: Le
 Wyświetla interaktywną planszę (miasta + trasy), pozwala oznaczać miasta i przełączać stany tras.
 Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłącznie orientacja landscape.
 
-> **Status: PoC** — bieżąca implementacja (zwłaszcza wygląd i format danych) będzie się jeszcze mocno
-> zmieniać. Nie przywiązuj się do szczegółów wyglądu ani do konkretnego schematu `mapa.json`.
+> **Status:** zrealizowane wszystkie etapy poza końcowym (patrz [plan-etapow.md](docs/plan-etapow.md)).
+> Wgrany jest pełny podkład planszy i **61 miast** (`mapa.json`), ale **lista tras jest jeszcze pusta**
+> (uzupełniana ręcznie w trybie deweloperskim), a pozycje miast to przybliżenie odczytane z podkładu.
+> Wygląd (kolory, kształty) wciąż może się zmieniać — nie przywiązuj się do jego szczegółów.
 
 ## Dokumentacja (czytaj najpierw)
 
@@ -18,8 +20,9 @@ Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłą
 - [docs/renderowanie-mapy.md](docs/renderowanie-mapy.md) — technologia UI i strategia renderowania planszy.
 - [docs/plan-etapow.md](docs/plan-etapow.md) — roadmapa etapów.
 
-> Dokumenty opisują też elementy **docelowe/planowane**, których nie ma jeszcze w kodzie (m.in. MVVM
-> `PageModels`, `SettingsPage`, `GameStateService`, liczniki, kolor gracza). Weryfikuj założenia względem kodu.
+> Dokumenty opisują architekturę **docelową** i miejscami rozjeżdżają się z nazwami w kodzie — najważniejsze:
+> serwis stanu rozgrywki to `IMapInteractionState`/`MapInteractionState` (nie `GameStateService`), a `MapPage`
+> nie ma osobnego `MapPageModel` (logika wyszukiwania jest w code-behind). Weryfikuj założenia względem kodu.
 
 ## Budowanie i uruchamianie
 
@@ -40,7 +43,11 @@ Szczegóły w [renderowanie-mapy.md](docs/renderowanie-mapy.md); w skrócie:
 - Renderer jest **bezstanowy**: przy każdym `Draw` odpytuje `Services/IMapInteractionState`
   (miasta oznaczone; trasy `None`/`Selected`/`Done`). Zmiana stanu → zdarzenie → `Invalidate()`.
 - Dane mapy: `Resources/Raw/mapa.json` → `Services/MapDataProvider` → modele w `Models/`.
-  Trasa to **łamana punktów** (`Route.Points`), a `WagonCount` = liczba jej odcinków.
+  Trasa to **lista wagoników** (`Route.Wagons`; każdy `WagonRectangle` = dwa punkty przekątnej prostokąta),
+  a `WagonCount` = liczba wagoników.
+- Tryb deweloperski (`Pages/DeveloperPage`, `PageModels/DeveloperPageModel`) edytuje robocze kopie miast/tras
+  (`Services/IDeveloperMapEditor`), z nazwami z `Services/ICityNameCatalog` i eksportem do schowka
+  (`Services/IMapDataExporter`) w formacie `mapa.json`.
 
 ## Konwencje kodu
 

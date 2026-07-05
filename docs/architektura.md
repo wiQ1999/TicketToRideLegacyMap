@@ -2,9 +2,10 @@
 
 Dokument projektowy dla aplikacji-towarzysza do gry **"Wsiąść do pociągu: Legacy — Legendy zachodu"**.
 Bazuje na [specyfikacji](specyfikacja-aplikacji.md) (sekcje 2 i 3) oraz na
-[renderowaniu mapy](renderowanie-mapy.md). Opisuje architekturę docelową — część elementów
-(`PageModels`, `SettingsPage`, `GameStateService`, tryb deweloperski, wyszukiwanie) nie jest
-jeszcze obecna w kodzie; weryfikuj założenia względem `src/Aplication`.
+[renderowaniu mapy](renderowanie-mapy.md). Warstwy i ekrany są zaimplementowane; dokument opisuje
+architekturę docelową i miejscami używa nazw innych niż kod — serwis stanu rozgrywki to
+`IMapInteractionState`/`MapInteractionState` (dalej: „`GameStateService`"), a `MapPage` nie ma
+osobnego `MapPageModel` (logika w code-behind). Weryfikuj założenia względem `src/Aplication`.
 
 ---
 
@@ -152,40 +153,22 @@ SettingsPage ("settings")  ──(wstecz)──►  MapPage
 
 ---
 
-## 7. Docelowa struktura katalogów
+## 7. Struktura katalogów
 
 ```
 src/Aplication/
-├── App.xaml / App.xaml.cs
-├── AppShell.xaml / .cs                 (menu, mapa, ustawienia, tryb deweloperski)
-├── MauiProgram.cs
-├── GlobalUsings.cs
-├── Models/
-│   ├── MapData.cs
-│   ├── City.cs
-│   ├── Route.cs
-│   ├── MapPoint.cs
-│   ├── RouteState.cs
-│   └── WagonColor.cs
-├── Services/
-│   ├── IMapDataProvider.cs / MapDataProvider.cs
-│   ├── ICityNameCatalog.cs / CityNameCatalog.cs
-│   ├── GameStateService.cs
-│   ├── IDeveloperMapEditor.cs / DeveloperMapEditor.cs
-│   └── IMapDataExporter.cs / MapDataExporter.cs
-├── PageModels/
-│   ├── MainMenuPageModel.cs
-│   ├── MapPageModel.cs
-│   ├── SettingsPageModel.cs
-│   └── DeveloperPageModel.cs
-├── Pages/
-│   ├── MainMenuPage.xaml / .cs
-│   ├── MapPage.xaml / .cs
-│   ├── SettingsPage.xaml / .cs
-│   ├── DeveloperPage.xaml / .cs
-│   └── Controls/                       (m.in. kontrolka mapy — wg renderowania)
-├── Resources/
-│   ├── Styles/, Fonts/, AppIcon/, Splash/
-│   └── Raw/     (mapa.json, podkład graficzny, katalog nazw miast)
-└── Platforms/   (Android, iOS, MacCatalyst, Windows — z wymuszeniem landscape)
+├── App.xaml / .cs, AppShell.xaml / .cs, MauiProgram.cs, GlobalUsings.cs
+├── Models/       MapData, City, Route, WagonRectangle, MapPoint, RouteState, WagonColor
+├── Services/     IMapDataProvider/MapDataProvider, MapDataException,
+│                 IMapInteractionState/MapInteractionState (stan rozgrywki, dalej „GameStateService"),
+│                 ICityNameCatalog/CityNameCatalog, IDeveloperMapEditor/DeveloperMapEditor,
+│                 IMapDataExporter/MapDataExporter, IErrorHandler/ModalErrorHandler
+├── PageModels/   MainMenuPageModel, SettingsPageModel, DeveloperPageModel  (MapPage → code-behind)
+├── Pages/        MainMenuPage, MapPage, SettingsPage, DeveloperPage  (.xaml / .cs)
+├── Controls/     MapBoardView  (host GraphicsView + gesty)
+├── Rendering/    MapDrawable, MapViewport, MapHitTester, MapMetrics, RouteColorPalette
+├── Resources/    Styles, Fonts, AppIcon, Splash; Raw/ (mapa.json + podkład graficzny)
+└── Platforms/    Android, iOS, MacCatalyst, Windows  (wymuszenie landscape)
 ```
+
+Katalog nazw miast (`ICityNameCatalog`) jest wpisany na stałe w kodzie (`CityNameCatalog.cs`), nie w `Raw/`.
