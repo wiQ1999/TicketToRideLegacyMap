@@ -3,24 +3,29 @@ using Aplication.Rendering;
 namespace Aplication.Controls;
 
 /// <summary>
-/// Plansza mapy: jeden <see cref="GraphicsView"/> rysujący całą mapę wektorowo, z gestami zoomu
-/// (pinch) i przesuwania (pan) modyfikującymi wspólny <see cref="MapViewport"/>. Na tym etapie
-/// widok służy wyłącznie do wyświetlania — bez oznaczania miast i tras.
+/// Interaktywna plansza: jeden <see cref="GraphicsView"/> rysujący całą mapę wektorowo, z gestami
+/// zoomu (pinch), przesuwania (pan) oraz dotyku (tap). Tap przechodzi przez <see cref="MapHitTester"/>
+/// do toggle miasta lub cyklu trasy. Stan interakcji jest zewnętrzny — jego zmiana wywołuje
+/// ponowne rysowanie.
 /// </summary>
 public sealed class MapBoardView : ContentView
 {
     private readonly MapViewport _viewport;
     private readonly MapDrawable _drawable;
+    private readonly MapHitTester _hitTester;
+    private readonly IMapInteractionState _state;
     private readonly GraphicsView _graphicsView;
 
     private double _pinchStartScale = 1.0;
     private double _lastPanX;
     private double _lastPanY;
 
-    public MapBoardView(MapData map)
+    public MapBoardView(MapData map, IMapInteractionState state)
     {
+        _state = state;
         _viewport = new MapViewport(map.CanvasSize.Width, map.CanvasSize.Height);
-        _drawable = new MapDrawable(map, _viewport);
+        _drawable = new MapDrawable(map, _viewport, state);
+        _hitTester = new MapHitTester(map);
 
         _graphicsView = new GraphicsView
         {
@@ -33,12 +38,17 @@ public sealed class MapBoardView : ContentView
         Content = _graphicsView;
 
         _graphicsView.SizeChanged += OnSizeChanged;
+        _state.Changed += OnStateChanged;
 
         LoadBackgroundAsync().FireAndForgetSafeAsync();
     }
 
     private void AddGestures()
     {
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += OnTapped;
+        _graphicsView.GestureRecognizers.Add(tap);
+
         var pinch = new PinchGestureRecognizer();
         pinch.PinchUpdated += OnPinchUpdated;
         _graphicsView.GestureRecognizers.Add(pinch);
@@ -58,6 +68,26 @@ public sealed class MapBoardView : ContentView
         // Re-kalibracja widoku „z lotu ptaka" przy każdej zmianie rozmiaru.
         _viewport.ResetToFit(_graphicsView.Width, _graphicsView.Height);
         _graphicsView.Invalidate();
+    }
+
+    private void OnTapped(object? sender, TappedEventArgs e)
+    {
+        var position = e.GetPosition(_graphicsView);
+        if (position is not { } p)
+        {
+            return;
+        }
+
+        var hit = _hitTester.HitTest(new PointF((float)p.X, (float)p.Y), _viewport);
+        switch (hit.Kind)
+        {
+            case MapHitKind.City:
+                _state.ToggleCity(hit.Id);
+                break;
+            case MapHitKind.Route:
+                _state.CycleRoute(hit.Id);
+                break;
+        }
     }
 
     private void OnPinchUpdated(object? sender, PinchGestureUpdatedEventArgs e)
@@ -93,6 +123,8 @@ public sealed class MapBoardView : ContentView
                 break;
         }
     }
+
+    private void OnStateChanged(object? sender, EventArgs e) => _graphicsView.Invalidate();
 
     private async Task LoadBackgroundAsync()
     {

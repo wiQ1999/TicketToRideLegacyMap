@@ -1,14 +1,14 @@
 namespace Aplication.Rendering;
 
 /// <summary>
-/// Rysuje całą planszę w jednym przebiegu: tło (opcjonalny podkład) → trasy → miasta. Na tym etapie
-/// widok służy wyłącznie do wyświetlania — renderer nie odpytuje żadnego stanu interakcji, pokazuje
-/// niemutowalną geometrię bazowej mapy. Wszystkie współrzędne liczy <see cref="MapViewport"/>, więc
-/// rysowanie i przyszły hit-testing pozostaną spójne.
+/// Rysuje całą planszę w jednym przebiegu: tło (opcjonalny podkład) → trasy → miasta. Nie przechowuje
+/// stanu interakcji — przy każdym rysowaniu odpytuje <see cref="IMapInteractionState"/> o stan trasy
+/// i oznaczenie miasta. Wszystkie współrzędne liczy <see cref="MapViewport"/>, więc rysowanie i
+/// hit-testing pozostają spójne.
 /// </summary>
-public sealed class MapDrawable(MapData map, MapViewport viewport) : IDrawable
+public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteractionState state) : IDrawable
 {
-    private static readonly Color GeometryColor = Color.FromArgb("#5D4037");
+    private static readonly Color CityMarkColor = Color.FromArgb("#EC407A");
 
     public Microsoft.Maui.Graphics.IImage? Background { get; set; }
 
@@ -46,16 +46,24 @@ public sealed class MapDrawable(MapData map, MapViewport viewport) : IDrawable
 
     private void DrawRoute(ICanvas canvas, Route route)
     {
+        var routeState = state.GetRouteState(route.Id);
+
+        // Domyślnie trasa jest przezroczysta — kolor trasy widać z podkładu (tła).
+        if (routeState == RouteState.None)
+        {
+            return;
+        }
+
         canvas.StrokeLineJoin = LineJoin.Miter;
         canvas.StrokeLineCap = LineCap.Butt;
 
         foreach (var wagon in route.Wagons)
         {
-            DrawWagon(canvas, wagon);
+            DrawWagon(canvas, wagon, routeState);
         }
     }
 
-    private void DrawWagon(ICanvas canvas, WagonRectangle wagon)
+    private void DrawWagon(ICanvas canvas, WagonRectangle wagon, RouteState routeState)
     {
         var corners = wagon.Corners.Select(viewport.MapToScreen).ToArray();
         var path = new PathF();
@@ -67,20 +75,34 @@ public sealed class MapDrawable(MapData map, MapViewport viewport) : IDrawable
 
         path.Close();
 
-        // Podgląd geometrii: sam obrys wagonika nad podkładem — bez wypełnienia i bez stanu.
-        canvas.StrokeColor = GeometryColor;
-        canvas.StrokeSize = 2f;
-        canvas.DrawPath(path);
+        if (routeState == RouteState.Done)
+        {
+            // Wykonana: pełne wypełnienie kolorem wagonów gracza.
+            canvas.FillColor = RouteColorPalette.Player;
+            canvas.FillPath(path);
+        }
+        else
+        {
+            // Zaznaczona: sam obrys kolorem wagonów gracza, wnętrze przezroczyste — inny kanał
+            // wizualny niż wypełnienie, więc rozróżnialne także przy zaburzeniach widzenia barw.
+            canvas.StrokeColor = RouteColorPalette.Player;
+            canvas.StrokeSize = 3f;
+            canvas.DrawPath(path);
+        }
     }
 
     private void DrawCity(ICanvas canvas, City city)
     {
+        // Bez oznaczenia miasto jest przezroczyste (nic nie rysujemy).
+        if (!state.IsCityMarked(city.Id))
+        {
+            return;
+        }
+
+        // Oznaczone: wypełniony punkt w kolorze akcentu.
         var center = viewport.MapToScreen(city.X, city.Y);
         var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
-
-        // Podgląd geometrii: obrys znacznika miasta nad podkładem — bez stanu oznaczenia.
-        canvas.StrokeColor = GeometryColor;
-        canvas.StrokeSize = 2f;
-        canvas.DrawCircle(center.X, center.Y, radius);
+        canvas.FillColor = CityMarkColor;
+        canvas.FillCircle(center.X, center.Y, radius);
     }
 }
