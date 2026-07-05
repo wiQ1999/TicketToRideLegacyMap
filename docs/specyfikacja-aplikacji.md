@@ -110,7 +110,7 @@ Aplikacja mobilna służąca jako cyfrowy pomocnik podczas rozgrywki w planszow�
 
 Specyfikacja w obecnej formie pokrywa funkcjonalny i biznesowy zakres aplikacji. Pozostałe elementy do uzupełnienia w kolejnych etapach prac:
 
-- **Dokładne dane mapy** (lista miast, lista tras wraz z przypisaną liczbą wagonów i kolorem trasy) - zostaną przygotowane przez zleceniodawcę w odrębnym kroku/rozmowie, na podstawie fizycznej gry "Wsiąść do pociągu: Legacy - Legendy zachodu".
+- **Dokładne dane mapy** (lista miast, lista tras wraz z przypisaną liczbą wagonów) - zostaną przygotowane przez zleceniodawcę w odrębnym kroku/rozmowie, na podstawie fizycznej gry "Wsiąść do pociągu: Legacy - Legendy zachodu".
 - **Szczegóły wizualne UI** (dokładny styl rozróżnienia zaznaczonej/wykonanej trasy, layout widoku mapy i widoku ustawień) - do ustalenia na etapie projektowania UI/UX.
 - **Wybór technologii** (natywne aplikacje vs. multiplatformowe) - do podjęcia na etapie technicznym projektu.
 
