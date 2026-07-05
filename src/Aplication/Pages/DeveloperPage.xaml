@@ -5,9 +5,104 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Tryb deweloperski">
 
-    <Label
-        HorizontalOptions="Center"
-        VerticalOptions="Center"
-        Text="Tryb deweloperski — w przygotowaniu." />
+    <Grid x:Name="RootGrid" ColumnDefinitions="*,340">
+
+        <!-- Plansza (MapBoardView, tryb podkładu) jest wstawiana w kodzie do kolumny 0. -->
+
+        <ActivityIndicator
+            x:Name="LoadingIndicator"
+            Grid.Column="0"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            IsRunning="True" />
+
+        <ScrollView Grid.Column="1" BackgroundColor="#F5F5F5">
+            <VerticalStackLayout Padding="14" Spacing="12">
+
+                <Label
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    Text="Miasta" />
+                <Label
+                    FontSize="12"
+                    TextColor="#555555"
+                    Text="Dotknij mapy, aby wskazać położenie, wybierz nazwę z listy i dodaj miasto." />
+
+                <!-- Formularz dodawania / edycji miasta -->
+                <Entry
+                    Placeholder="Nazwa miasta"
+                    Text="{Binding CityName}" />
+
+                <CollectionView
+                    ItemsSource="{Binding NameSuggestions}"
+                    IsVisible="{Binding HasSuggestions}"
+                    SelectionMode="Single"
+                    SelectionChanged="OnNameSuggestionSelected"
+                    BackgroundColor="White"
+                    MaximumHeightRequest="180">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Padding="10,8" Text="{Binding .}" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Text="{Binding PickedPositionText}" />
+
+                <HorizontalStackLayout Spacing="8">
+                    <Button
+                        Text="{Binding SubmitLabel}"
+                        Command="{Binding AddOrUpdateCityCommand}" />
+                    <Button
+                        Text="Anuluj"
+                        IsVisible="{Binding IsEditing}"
+                        Command="{Binding CancelEditCommand}" />
+                </HorizontalStackLayout>
+
+                <BoxView HeightRequest="1" Color="#DDDDDD" />
+
+                <!-- Lista roboczych miast -->
+                <Label
+                    FontAttributes="Bold"
+                    Text="Lista miast" />
+
+                <CollectionView ItemsSource="{Binding Cities}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="0,4" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                <VerticalStackLayout Grid.Column="0">
+                                    <Label FontAttributes="Bold" Text="{Binding Name}" />
+                                    <Label FontSize="11" TextColor="#777777">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0:0}, {1:0}">
+                                                <Binding Path="X" />
+                                                <Binding Path="Y" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <Button
+                                    Grid.Column="1"
+                                    Text="Edytuj"
+                                    FontSize="11"
+                                    Padding="8,2"
+                                    Command="{Binding Path=BindingContext.EditCityCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                    CommandParameter="{Binding .}" />
+                                <Button
+                                    Grid.Column="2"
+                                    Text="Usuń"
+                                    FontSize="11"
+                                    Padding="8,2"
+                                    Command="{Binding Path=BindingContext.DeleteCityCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                    CommandParameter="{Binding .}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 
 </ContentPage>

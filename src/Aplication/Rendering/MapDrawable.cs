@@ -2,28 +2,68 @@ namespace Aplication.Rendering;
 
 /// <summary>
 /// Rysuje całą planszę w jednym przebiegu: tło (opcjonalny podkład) → trasy → miasta. Nie przechowuje
-/// stanu interakcji — przy każdym rysowaniu odpytuje <see cref="IMapInteractionState"/> o stan trasy
-/// i oznaczenie miasta. Wszystkie współrzędne liczy <see cref="MapViewport"/>, więc rysowanie i
-/// hit-testing pozostają spójne.
+/// stanu interakcji — w trybie mapy przy każdym rysowaniu odpytuje <see cref="IMapInteractionState"/>
+/// o stan trasy i oznaczenie miasta. W trybie deweloperskim (<paramref name="state"/> = <c>null</c>)
+/// rysuje jedynie podkład oraz nakładkę roboczą. Wszystkie współrzędne liczy <see cref="MapViewport"/>,
+/// więc rysowanie i hit-testing pozostają spójne.
 /// </summary>
-public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteractionState state) : IDrawable
+public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteractionState? state) : IDrawable
 {
     private static readonly Color CityMarkColor = Color.FromArgb("#EC407A");
+    private static readonly Color DeveloperMarkerColor = Color.FromArgb("#1565C0");
+    private static readonly Color DeveloperPendingColor = Color.FromArgb("#EF6C00");
 
     public Microsoft.Maui.Graphics.IImage? Background { get; set; }
+
+    /// <summary>Robocze miasta (tryb deweloperski) rysowane jako znaczniki nad podkładem.</summary>
+    public IReadOnlyList<MapPoint>? DeveloperMarkers { get; set; }
+
+    /// <summary>Wskazany na mapie, jeszcze niezatwierdzony punkt (tryb deweloperski).</summary>
+    public MapPoint? DeveloperPendingPoint { get; set; }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
         DrawBackground(canvas);
 
-        foreach (var route in map.Routes)
+        if (state is { } interactionState)
         {
-            DrawRoute(canvas, route);
+            foreach (var route in map.Routes)
+            {
+                DrawRoute(canvas, route, interactionState);
+            }
+
+            foreach (var city in map.Cities)
+            {
+                DrawCity(canvas, city, interactionState);
+            }
+
+            return;
         }
 
-        foreach (var city in map.Cities)
+        DrawDeveloperOverlay(canvas);
+    }
+
+    private void DrawDeveloperOverlay(ICanvas canvas)
+    {
+        if (DeveloperMarkers is { } markers)
         {
-            DrawCity(canvas, city);
+            canvas.FillColor = DeveloperMarkerColor;
+            foreach (var marker in markers)
+            {
+                var center = viewport.MapToScreen(marker);
+                canvas.FillCircle(center.X, center.Y, (float)(MapMetrics.CityRadius * viewport.Scale));
+            }
+        }
+
+        if (DeveloperPendingPoint is { } pending)
+        {
+            var center = viewport.MapToScreen(pending);
+            var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
+            canvas.StrokeColor = DeveloperPendingColor;
+            canvas.StrokeSize = 3f;
+            canvas.DrawCircle(center.X, center.Y, radius);
+            canvas.DrawLine(center.X - radius, center.Y, center.X + radius, center.Y);
+            canvas.DrawLine(center.X, center.Y - radius, center.X, center.Y + radius);
         }
     }
 
@@ -44,7 +84,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         }
     }
 
-    private void DrawRoute(ICanvas canvas, Route route)
+    private void DrawRoute(ICanvas canvas, Route route, IMapInteractionState state)
     {
         var routeState = state.GetRouteState(route.Id);
 
@@ -59,11 +99,11 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
         foreach (var wagon in route.Wagons)
         {
-            DrawWagon(canvas, wagon, routeState);
+            DrawWagon(canvas, wagon, routeState, state.WagonColor);
         }
     }
 
-    private void DrawWagon(ICanvas canvas, WagonRectangle wagon, RouteState routeState)
+    private void DrawWagon(ICanvas canvas, WagonRectangle wagon, RouteState routeState, WagonColor wagonColor)
     {
         var corners = wagon.Corners.Select(viewport.MapToScreen).ToArray();
         var path = new PathF();
@@ -75,7 +115,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
         path.Close();
 
-        var playerColor = RouteColorPalette.ToColor(state.WagonColor);
+        var playerColor = RouteColorPalette.ToColor(wagonColor);
 
         if (routeState == RouteState.Done)
         {
@@ -93,7 +133,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         }
     }
 
-    private void DrawCity(ICanvas canvas, City city)
+    private void DrawCity(ICanvas canvas, City city, IMapInteractionState state)
     {
         // Bez oznaczenia miasto jest przezroczyste (nic nie rysujemy).
         if (!state.IsCityMarked(city.Id))

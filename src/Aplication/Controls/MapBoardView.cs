@@ -4,23 +4,27 @@ namespace Aplication.Controls;
 
 /// <summary>
 /// Interaktywna plansza: jeden <see cref="GraphicsView"/> rysujący całą mapę wektorowo, z gestami
-/// zoomu (pinch), przesuwania (pan) oraz dotyku (tap). Tap przechodzi przez <see cref="MapHitTester"/>
-/// do toggle miasta lub cyklu trasy. Stan interakcji jest zewnętrzny — jego zmiana wywołuje
-/// ponowne rysowanie.
+/// zoomu (pinch), przesuwania (pan) oraz dotyku (tap). W trybie mapy (przekazany stan interakcji)
+/// tap przechodzi przez <see cref="MapHitTester"/> do toggle miasta lub cyklu trasy. W trybie
+/// deweloperskim (stan = <c>null</c>) tap zgłasza wskazane położenie przez <see cref="MapPointPicked"/>,
+/// a plansza służy jako podkład z nakładką roboczą.
 /// </summary>
 public sealed class MapBoardView : ContentView
 {
     private readonly MapViewport _viewport;
     private readonly MapDrawable _drawable;
     private readonly MapHitTester _hitTester;
-    private readonly IMapInteractionState _state;
+    private readonly IMapInteractionState? _state;
     private readonly GraphicsView _graphicsView;
 
     private double _pinchStartScale = 1.0;
     private double _lastPanX;
     private double _lastPanY;
 
-    public MapBoardView(MapData map, IMapInteractionState state)
+    /// <summary>Zgłaszane po dotknięciu planszy w trybie deweloperskim — z punktem w przestrzeni mapy.</summary>
+    public event EventHandler<MapPoint>? MapPointPicked;
+
+    public MapBoardView(MapData map, IMapInteractionState? state)
     {
         _state = state;
         _viewport = new MapViewport(map.CanvasSize.Width, map.CanvasSize.Height);
@@ -38,9 +42,20 @@ public sealed class MapBoardView : ContentView
         Content = _graphicsView;
 
         _graphicsView.SizeChanged += OnSizeChanged;
-        _state.Changed += OnStateChanged;
+        if (_state is not null)
+        {
+            _state.Changed += OnStateChanged;
+        }
 
         LoadBackgroundAsync().FireAndForgetSafeAsync();
+    }
+
+    /// <summary>Ustawia nakładkę roboczą trybu deweloperskiego (znaczniki miast + wskazany punkt) i przerysowuje.</summary>
+    public void SetDeveloperOverlay(IReadOnlyList<MapPoint> markers, MapPoint? pendingPoint)
+    {
+        _drawable.DeveloperMarkers = markers;
+        _drawable.DeveloperPendingPoint = pendingPoint;
+        _graphicsView.Invalidate();
     }
 
     private void AddGestures()
@@ -78,14 +93,21 @@ public sealed class MapBoardView : ContentView
             return;
         }
 
+        // Tryb deweloperski: tap wskazuje surowe położenie na mapie, bez oznaczania miast/tras.
+        if (_state is not { } state)
+        {
+            MapPointPicked?.Invoke(this, _viewport.ScreenToMap(p.X, p.Y));
+            return;
+        }
+
         var hit = _hitTester.HitTest(new PointF((float)p.X, (float)p.Y), _viewport);
         switch (hit.Kind)
         {
             case MapHitKind.City:
-                _state.ToggleCity(hit.Id);
+                state.ToggleCity(hit.Id);
                 break;
             case MapHitKind.Route:
-                _state.CycleRoute(hit.Id);
+                state.CycleRoute(hit.Id);
                 break;
         }
     }

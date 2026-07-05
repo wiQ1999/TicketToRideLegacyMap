@@ -27,9 +27,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<IErrorHandler>(sp => sp.GetRequiredService<ModalErrorHandler>());
         builder.Services.AddSingleton<IMapDataProvider, MapDataProvider>();
         builder.Services.AddSingleton<IMapInteractionState, MapInteractionState>();
+        builder.Services.AddSingleton<ICityNameCatalog, CityNameCatalog>();
+        builder.Services.AddSingleton<IDeveloperMapEditor, DeveloperMapEditor>();
         builder.Services.AddTransient<MainMenuPageModel>();
         builder.Services.AddTransient<MainMenuPage>();
         builder.Services.AddTransient<MapPage>();
+        builder.Services.AddTransient<DeveloperPageModel>();
         builder.Services.AddTransient<DeveloperPage>();
         builder.Services.AddTransient<SettingsPageModel>();
         builder.Services.AddTransient<SettingsPage>();
