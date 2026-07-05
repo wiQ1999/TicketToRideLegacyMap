@@ -72,7 +72,7 @@ public sealed class MapDataProvider : IMapDataProvider
         var canvasSize = new MapSize(canvas.Width, canvas.Height);
 
         var cities = BuildCities(dto.Cities, canvasSize);
-        var routes = BuildRoutes(dto.Routes, cities);
+        var routes = BuildRoutes(dto.Routes, cities, canvasSize);
 
         return new MapData(canvasSize, cities.Values.ToList(), routes);
     }
@@ -93,9 +93,9 @@ public sealed class MapDataProvider : IMapDataProvider
                 throw new MapDataException("Każde miasto musi mieć niepuste pole „id\".");
             }
 
-            if (!cities.TryAdd(dto.Id, new City(dto.Id, dto.X, dto.Y)))
+            if (string.IsNullOrWhiteSpace(dto.Name))
             {
-                throw new MapDataException($"Zduplikowany identyfikator miasta: „{dto.Id}\".");
+                throw new MapDataException($"Miasto „{dto.Id}\" musi mieć niepuste pole „name\".");
             }
 
             if (dto.X < 0 || dto.X > canvas.Width || dto.Y < 0 || dto.Y > canvas.Height)
@@ -103,13 +103,18 @@ public sealed class MapDataProvider : IMapDataProvider
                 throw new MapDataException(
                     $"Współrzędne miasta „{dto.Id}\" wykraczają poza rozmiar planszy.");
             }
+
+            if (!cities.TryAdd(dto.Id, new City(dto.Id, dto.Name, dto.X, dto.Y)))
+            {
+                throw new MapDataException($"Zduplikowany identyfikator miasta: „{dto.Id}\".");
+            }
         }
 
         return cities;
     }
 
     private static IReadOnlyList<Route> BuildRoutes(
-        List<RouteDto>? routeDtos, IReadOnlyDictionary<string, City> cities)
+        List<RouteDto>? routeDtos, IReadOnlyDictionary<string, City> cities, MapSize canvas)
     {
         if (routeDtos is null)
         {
@@ -142,17 +147,47 @@ public sealed class MapDataProvider : IMapDataProvider
                     $"Trasa „{dto.Id}\" odwołuje się do nieistniejącego miasta końcowego „{dto.To}\".");
             }
 
-            if (dto.Points is not { Count: >= 2 })
+            if (dto.Wagons is not { Count: >= 1 })
             {
                 throw new MapDataException(
-                    $"Trasa „{dto.Id}\" musi mieć co najmniej 2 punkty (początek i koniec = 1 wagon).");
+                    $"Trasa „{dto.Id}\" musi mieć co najmniej jeden wagonik.");
             }
 
-            var points = dto.Points.Select(p => new MapPoint(p.X, p.Y)).ToArray();
-            routes.Add(new Route(dto.Id, dto.From, dto.To, points));
+            var wagons = dto.Wagons.Select(w => BuildWagon(dto.Id, w, canvas)).ToArray();
+            routes.Add(new Route(dto.Id, dto.From, dto.To, wagons));
         }
 
         return routes;
+    }
+
+    private static WagonRectangle BuildWagon(string routeId, WagonDto dto, MapSize canvas)
+    {
+        if (dto.A is not { } a || dto.B is not { } b)
+        {
+            throw new MapDataException(
+                $"Trasa „{routeId}\" ma wagonik bez obu punktów przekątnej („a\"/„b\").");
+        }
+
+        var wagon = new WagonRectangle(new MapPoint(a.X, a.Y), new MapPoint(b.X, b.Y));
+
+        // Wagonik może być obrócony pod dowolnym kątem — w zakresie planszy muszą mieścić się
+        // wszystkie 4 rogi (dwa podane wprost i dwa wyliczone z założenia kątów prostych), nie
+        // tylko podana przekątna.
+        foreach (var corner in wagon.Corners)
+        {
+            ValidateInCanvas(routeId, corner, canvas);
+        }
+
+        return wagon;
+    }
+
+    private static void ValidateInCanvas(string routeId, MapPoint point, MapSize canvas)
+    {
+        if (point.X < 0 || point.X > canvas.Width || point.Y < 0 || point.Y > canvas.Height)
+        {
+            throw new MapDataException(
+                $"Trasa „{routeId}\" ma wagonik z punktem poza rozmiarem planszy.");
+        }
     }
 
     // --- DTO odpowiadające schematowi mapa.json ---
@@ -173,6 +208,7 @@ public sealed class MapDataProvider : IMapDataProvider
     private sealed class CityDto
     {
         public string? Id { get; set; }
+        public string? Name { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
     }
@@ -182,7 +218,13 @@ public sealed class MapDataProvider : IMapDataProvider
         public string? Id { get; set; }
         public string? From { get; set; }
         public string? To { get; set; }
-        public List<PointDto>? Points { get; set; }
+        public List<WagonDto>? Wagons { get; set; }
+    }
+
+    private sealed class WagonDto
+    {
+        public PointDto? A { get; set; }
+        public PointDto? B { get; set; }
     }
 
     private sealed class PointDto

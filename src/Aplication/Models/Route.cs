@@ -1,15 +1,15 @@
 namespace Aplication.Models;
 
 /// <summary>
-/// Trasa (połączenie) między dwoma miastami — niemutowalny element mapy bazowej.
-/// Liczba wagonów oraz kolor są wartościami stałymi wbudowanymi w mapę. Stan
-/// zaznaczenia/wykonania trzymany jest osobno w serwisie stanu.
+/// Trasa (połączenie) między dwoma miastami — niemutowalny element mapy bazowej. Kształt trasy to
+/// lista niezależnych prostokątów wagoników; liczba wagonów oraz kolor są wartościami stałymi
+/// wbudowanymi w mapę. Stan zaznaczenia/wykonania trzymany jest osobno w serwisie stanu.
 /// </summary>
 public sealed class Route(
     string id,
     string cityFromId,
     string cityToId,
-    IReadOnlyList<MapPoint> points)
+    IReadOnlyList<WagonRectangle> wagons)
 {
     public string Id { get; } = id;
 
@@ -17,7 +17,7 @@ public sealed class Route(
 
     public string CityToId { get; } = cityToId;
 
-    public IReadOnlyList<MapPoint> Points { get; } = points;
+    public IReadOnlyList<WagonRectangle> Wagons { get; } = wagons;
 
-    public int WagonCount => Points.Count - 1;
+    public int WagonCount => Wagons.Count;
 }
