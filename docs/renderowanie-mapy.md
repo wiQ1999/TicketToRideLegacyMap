@@ -58,10 +58,12 @@ są poza kanwą — jako elementy XAML w nakładce nad `GraphicsView`, niezależ
 
 - **Miasto** — punkt `(X, Y)` w przestrzeni mapy. Nazwa miasta **nie jest rysowana na mapie** — służy
   wyłącznie wyszukiwaniu (2.7) i trybowi deweloperskiemu (2.8), poza kanwą.
-- **Trasa** — uporządkowana lista **wagoników**; każdy wagonik to niezależny, osiowo zorientowany
-  prostokąt zdefiniowany dwoma punktami (przekątna) w przestrzeni mapy. `WagonCount` to liczba
-  wagoników wprost z danych — nie jest wyliczana z geometrii. Renderer buduje kształt każdego wagonika
-  z osobna; ta sama geometria (prostokąty) służy do hit-testingu (§5) — jedno źródło kształtu.
+- **Trasa** — uporządkowana lista **wagoników**; każdy wagonik to niezależny **kwadrat**, który może
+  być obrócony pod dowolnym kątem, zdefiniowany dwoma przeciwległymi rogami przekątnej w przestrzeni
+  mapy. Pozostałe dwa rogi wylicza się z założenia kątów prostych: druga przekątna ma ten sam środek
+  i długość, obróconą o 90°. `WagonCount` to liczba wagoników wprost z danych — nie jest wyliczana
+  z geometrii. Renderer buduje kształt każdego wagonika z osobna jako czworokąt; ta sama geometria
+  służy do hit-testingu (§5) — jedno źródło kształtu.
 
 ---
 
@@ -92,8 +94,9 @@ Punkt dotyku (piksele ekranu) przeliczamy odwrotną transformacją (`MapViewport
 i tam testujemy — geometria jest stała i niezależna od zoomu:
 
 - **Miasto:** trafienie, gdy punkt mieści się w stałym promieniu od pozycji miasta — bez dodatkowego marginesu tolerancji; klikalny obszar odpowiada dokładnie temu, co narysowane (§4).
-- **Trasa:** trafienie, gdy punkt mieści się w prostokącie (bbox) **dowolnego wagonika** trasy —
-  bez dodatkowego marginesu tolerancji; klikalny obszar odpowiada dokładnie temu, co narysowane (§4).
+- **Trasa:** trafienie, gdy punkt mieści się w czworokącie **dowolnego wagonika** trasy (test
+  punkt-w-wielokącie, bo wagonik może być obrócony) — bez dodatkowego marginesu tolerancji; klikalny
+  obszar odpowiada dokładnie temu, co narysowane (§4).
 
 **Miasta testujemy przed trasami** (leżą na końcach tras), a przy kilku kandydatach wygrywa **najbliższy**.
 Przy ~40 miastach i ~100 trasach wystarcza liniowy przegląd — bez struktur przestrzennych.
