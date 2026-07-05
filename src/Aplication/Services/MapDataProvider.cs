@@ -170,9 +170,19 @@ public sealed class MapDataProvider : IMapDataProvider
 
         var wagon = new WagonRectangle(new MapPoint(a.X, a.Y), new MapPoint(b.X, b.Y));
 
+        // Przekątna musi być na tyle długa, by krótszy bok był faktycznie krótszy (d ≥ w·√2);
+        // inaczej geometria prostokąta jest niewyznaczalna (wyliczone rogi byłyby NaN).
+        var dx = b.X - a.X;
+        var dy = b.Y - a.Y;
+        var diagonal = Math.Sqrt((dx * dx) + (dy * dy));
+        if (diagonal < WagonRectangle.ShortSide * Math.Sqrt(2))
+        {
+            throw new MapDataException(
+                $"Trasa „{routeId}\" ma wagonik o zbyt krótkiej przekątnej względem stałego krótszego boku.");
+        }
+
         // Wagonik może być obrócony pod dowolnym kątem — w zakresie planszy muszą mieścić się
-        // wszystkie 4 rogi (dwa podane wprost i dwa wyliczone z założenia kątów prostych), nie
-        // tylko podana przekątna.
+        // wszystkie 4 rogi (dwa podane wprost i dwa wyliczone), nie tylko podana przekątna.
         foreach (var corner in wagon.Corners)
         {
             ValidateInCanvas(routeId, corner, canvas);

@@ -58,12 +58,12 @@ są poza kanwą — jako elementy XAML w nakładce nad `GraphicsView`, niezależ
 
 - **Miasto** — punkt `(X, Y)` w przestrzeni mapy. Nazwa miasta **nie jest rysowana na mapie** — służy
   wyłącznie wyszukiwaniu (2.7) i trybowi deweloperskiemu (2.8), poza kanwą.
-- **Trasa** — uporządkowana lista **wagoników**; każdy wagonik to niezależny **kwadrat**, który może
+- **Trasa** — uporządkowana lista **wagoników**; każdy wagonik to niezależny **prostokąt**, który może
   być obrócony pod dowolnym kątem, zdefiniowany dwoma przeciwległymi rogami przekątnej w przestrzeni
-  mapy. Pozostałe dwa rogi wylicza się z założenia kątów prostych: druga przekątna ma ten sam środek
-  i długość, obróconą o 90°. `WagonCount` to liczba wagoników wprost z danych — nie jest wyliczana
-  z geometrii. Renderer buduje kształt każdego wagonika z osobna jako czworokąt; ta sama geometria
-  służy do hit-testingu (§5) — jedno źródło kształtu.
+  mapy. Pozostałe dwa rogi wylicza się z długości tej przekątnej i **stałego krótszego boku** (wspólnego
+  dla wszystkich wagoników); dłuższy bok wynika z twierdzenia Pitagorasa. `WagonCount` to liczba
+  wagoników wprost z danych — nie jest wyliczana z geometrii. Renderer buduje kształt każdego wagonika
+  z osobna jako czworokąt; ta sama geometria służy do hit-testingu (§5) — jedno źródło kształtu.
 
 ---
 

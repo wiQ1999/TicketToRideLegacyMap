@@ -1,26 +1,41 @@
 namespace Aplication.Models;
 
 /// <summary>
-/// Kwadrat pojedynczego wagonika trasy, zdefiniowany dwoma przeciwległymi rogami przekątnej
+/// Prostokąt pojedynczego wagonika trasy, zdefiniowany dwoma przeciwległymi rogami przekątnej
 /// (<see cref="A"/>, <see cref="B"/>) w przestrzeni mapy — może być obrócony pod dowolnym kątem.
-/// Pozostałe dwa rogi wyliczane są z założenia kątów prostych: druga przekątna ma ten sam środek
-/// i długość co <see cref="A"/>-<see cref="B"/>, obróconą o 90°.
+/// Pozostałe dwa rogi wyliczane są z długości przekątnej i stałego krótszego boku
+/// (<see cref="ShortSide"/>): dłuższy bok wynika z twierdzenia Pitagorasa.
 /// </summary>
 public readonly record struct WagonRectangle(MapPoint A, MapPoint B)
 {
+    // Stała długość krótszego boku wagonika w przestrzeni mapy — wspólna dla wszystkich wagoników.
+    public const double ShortSide = 16.0;
+
     public MapPoint Center => new((A.X + B.X) / 2.0, (A.Y + B.Y) / 2.0);
 
-    /// <summary>Cztery rogi w kolejności obwodu (A, róg drugiej przekątnej, B, przeciwny róg drugiej przekątnej).</summary>
+    // Cztery rogi prostokąta w kolejności obwodu: A, A+krótszy bok, B, B−krótszy bok.
     public IReadOnlyList<MapPoint> Corners
     {
         get
         {
-            var center = Center;
-            var dx = B.X - center.X;
-            var dy = B.Y - center.Y;
-            var c = new MapPoint(center.X - dy, center.Y + dx);
-            var d = new MapPoint(center.X + dy, center.Y - dx);
-            return [A, c, B, d];
+            // Przekątna A→B ma długość d; krótszy bok jest stały (ShortSide = w), dłuższy L = √(d²−w²).
+            // Krótki bok przy rogu A to wektor v o długości w, odchylony od przekątnej o kąt α, gdzie
+            // cos α = w/d (rzut jednostkowej przekątnej na kierunek krótkiego boku). Pozostałe rogi to
+            // A+v oraz B−v; dłuższy bok wychodzi jako AB−v.
+            var dx = B.X - A.X;
+            var dy = B.Y - A.Y;
+            var diagonal = Math.Sqrt((dx * dx) + (dy * dy));
+
+            var cos = ShortSide / diagonal;             // = w / d
+            var sin = Math.Sqrt(1.0 - (cos * cos));     // = L / d
+
+            // v = w · (jednostkowa przekątna obrócona o +α); |v| = ShortSide.
+            var vx = (ShortSide / diagonal) * ((dx * cos) - (dy * sin));
+            var vy = (ShortSide / diagonal) * ((dx * sin) + (dy * cos));
+
+            var d = new MapPoint(A.X + vx, A.Y + vy);
+            var c = new MapPoint(B.X - vx, B.Y - vy);
+            return [A, d, B, c];
         }
     }
 
