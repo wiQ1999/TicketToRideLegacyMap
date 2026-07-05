@@ -1,6 +1,6 @@
 namespace Aplication.Pages;
 
-public partial class MainPage : ContentPage
+public partial class MapPage : ContentPage
 {
     private readonly IMapDataProvider _mapDataProvider;
     private readonly IMapInteractionState _interactionState;
@@ -8,7 +8,7 @@ public partial class MainPage : ContentPage
     private bool _loaded;
     private MapData? _map;
 
-    public MainPage(
+    public MapPage(
         IMapDataProvider mapDataProvider,
         IMapInteractionState interactionState,
         IErrorHandler errorHandler)

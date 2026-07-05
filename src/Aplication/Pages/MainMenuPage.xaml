@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Aplication.Pages.MainMenuPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Wsiąść do pociągu">
+
+    <VerticalStackLayout
+        Padding="24"
+        Spacing="16"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+
+        <Label
+            FontSize="22"
+            FontAttributes="Bold"
+            HorizontalOptions="Center"
+            Text="Wsiąść do pociągu: Legendy zachodu" />
+
+        <Button
+            Text="Mapa gry"
+            WidthRequest="220"
+            Command="{Binding GoToMapCommand}" />
+
+        <Button
+            Text="Tryb deweloperski"
+            WidthRequest="220"
+            Command="{Binding GoToDeveloperCommand}" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

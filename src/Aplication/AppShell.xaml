@@ -8,8 +8,8 @@
     Title="Wsiąść do pociągu">
 
     <ShellContent
-        Title="Mapa"
-        ContentTemplate="{DataTemplate pages:MainPage}"
-        Route="main" />
+        Title="Menu"
+        ContentTemplate="{DataTemplate pages:MainMenuPage}"
+        Route="menu" />
 
 </Shell>
