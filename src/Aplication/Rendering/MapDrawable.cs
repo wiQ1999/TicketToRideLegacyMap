@@ -1,16 +1,15 @@
 namespace Aplication.Rendering;
 
 /// <summary>
-/// Rysuje całą planszę w jednym przebiegu: tło (opcjonalny podkład) → trasy → miasta →
-/// oznaczenia stanów → etykiety. Nie przechowuje stanu interakcji — odpytuje
-/// <see cref="IMapInteractionState"/> przy każdym rysowaniu. Wszystkie współrzędne
-/// liczone są ręcznie przez <see cref="MapViewport"/>, więc render i hit-testing są spójne.
+/// Rysuje całą planszę w jednym przebiegu: tło (opcjonalny podkład) → trasy → miasta. Na tym etapie
+/// widok służy wyłącznie do wyświetlania — renderer nie odpytuje żadnego stanu interakcji, pokazuje
+/// niemutowalną geometrię bazowej mapy. Wszystkie współrzędne liczy <see cref="MapViewport"/>, więc
+/// rysowanie i przyszły hit-testing pozostaną spójne.
 /// </summary>
-public sealed class MapDrawable(
-    MapData map,
-    MapViewport viewport,
-    IMapInteractionState state) : IDrawable
+public sealed class MapDrawable(MapData map, MapViewport viewport) : IDrawable
 {
+    private static readonly Color GeometryColor = Color.FromArgb("#5D4037");
+
     public Microsoft.Maui.Graphics.IImage? Background { get; set; }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -47,24 +46,16 @@ public sealed class MapDrawable(
 
     private void DrawRoute(ICanvas canvas, Route route)
     {
-        var routeState = state.GetRouteState(route.Id);
-
-        // Domyślnie trasa jest przezroczysta — kolor trasy widać z podkładu (tła).
-        if (routeState == RouteState.None)
-        {
-            return;
-        }
-
         canvas.StrokeLineJoin = LineJoin.Miter;
         canvas.StrokeLineCap = LineCap.Butt;
 
         foreach (var wagon in route.Wagons)
         {
-            DrawWagon(canvas, wagon, routeState);
+            DrawWagon(canvas, wagon);
         }
     }
 
-    private void DrawWagon(ICanvas canvas, WagonRectangle wagon, RouteState routeState)
+    private void DrawWagon(ICanvas canvas, WagonRectangle wagon)
     {
         var corners = wagon.Corners.Select(viewport.MapToScreen).ToArray();
         var path = new PathF();
@@ -76,68 +67,20 @@ public sealed class MapDrawable(
 
         path.Close();
 
-        if (routeState == RouteState.Done)
-        {
-            // Wykonany: wypełnienie kolorem gracza + ukośne paski (45°) w ciemniejszym odcieniu,
-            // co wyróżnia go od nieoznaczonego wagonika w tym samym kolorze.
-            canvas.FillColor = RouteColorPalette.Player;
-            canvas.FillPath(path);
-
-            canvas.StrokeColor = Color.FromArgb("#1B5E20");
-            canvas.StrokeSize = 2f;
-            DrawDiagonalHatch(canvas, path, corners, 8f);
-
-            canvas.StrokeSize = 1.5f;
-            canvas.DrawPath(path);
-        }
-        else
-        {
-            // Zaznaczony: samo obramowanie (różowy obrys z ciemną krawędzią), wnętrze przezroczyste.
-            canvas.StrokeColor = Color.FromArgb("#AD1457");
-            canvas.StrokeSize = 3.5f;
-            canvas.DrawPath(path);
-
-            canvas.StrokeColor = Color.FromArgb("#EC407A");
-            canvas.StrokeSize = 2f;
-            canvas.DrawPath(path);
-        }
+        // Podgląd geometrii: sam obrys wagonika nad podkładem — bez wypełnienia i bez stanu.
+        canvas.StrokeColor = GeometryColor;
+        canvas.StrokeSize = 2f;
+        canvas.DrawPath(path);
     }
 
     private void DrawCity(ICanvas canvas, City city)
     {
-        // Bez zaznaczenia miasto jest przezroczyste (nic nie rysujemy).
-        if (!state.IsCityMarked(city.Id))
-        {
-            return;
-        }
-
-        // Zaznaczone: różowe wypełnienie, bez obramowania.
         var center = viewport.MapToScreen(city.X, city.Y);
         var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
-        canvas.FillColor = Color.FromArgb("#EC407A");
-        canvas.FillCircle(center.X, center.Y, radius);
-    }
 
-    // Ukośne kreski pod kątem 45° (w przestrzeni ekranu), przycięte do konturu wagonika —
-    // niezależnie od tego, pod jakim kątem sam wagonik jest obrócony.
-    private static void DrawDiagonalHatch(ICanvas canvas, PathF path, IReadOnlyList<PointF> corners, float spacing)
-    {
-        var minX = corners.Min(p => p.X);
-        var maxX = corners.Max(p => p.X);
-        var minY = corners.Min(p => p.Y);
-        var maxY = corners.Max(p => p.Y);
-        var w = maxX - minX;
-        var h = maxY - minY;
-        var reach = w + h;
-
-        canvas.SaveState();
-        canvas.ClipPath(path);
-
-        for (var c = -reach; c <= reach; c += spacing)
-        {
-            canvas.DrawLine(minX + c, minY, minX + c + h, minY + h);
-        }
-
-        canvas.RestoreState();
+        // Podgląd geometrii: obrys znacznika miasta nad podkładem — bez stanu oznaczenia.
+        canvas.StrokeColor = GeometryColor;
+        canvas.StrokeSize = 2f;
+        canvas.DrawCircle(center.X, center.Y, radius);
     }
 }

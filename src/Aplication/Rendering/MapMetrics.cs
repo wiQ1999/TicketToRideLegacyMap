@@ -9,10 +9,4 @@ public static class MapMetrics
 {
     /// <summary>Promień okręgu miasta (średnica = 2×). Steruje wielkością kropki miasta.</summary>
     public const double CityRadius = 14.0;
-
-    /// <summary>
-    /// Minimalny komfortowy rozmiar celu dotyku w pikselach ekranu (DIP). Próg trafienia
-    /// dzielony przez skalę utrzymuje stały rozmiar celu na ekranie niezależnie od zoomu.
-    /// </summary>
-    public const double MinTouchTarget = 28.0;
 }

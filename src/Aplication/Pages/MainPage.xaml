@@ -15,7 +15,7 @@
             VerticalOptions="Center"
             IsRunning="True" />
 
-        <!-- Krótka legenda PoC: jak działa interakcja. -->
+        <!-- Krótka legenda: dostępne gesty widoku mapy. -->
         <Border
             Margin="12"
             Padding="10,6"
@@ -29,7 +29,7 @@
             <Label
                 FontSize="11"
                 TextColor="White"
-                Text="Tap miasta = oznacz/odznacz • Tap trasy = brak→zaznaczona→wykonana • Pinch = zoom • Pan = przesuń" />
+                Text="Pinch = zoom • Pan = przesuń" />
         </Border>
 
     </Grid>
