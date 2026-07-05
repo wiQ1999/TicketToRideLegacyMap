@@ -6,6 +6,7 @@ public partial class MainPage : ContentPage
     private readonly IMapInteractionState _interactionState;
     private readonly IErrorHandler _errorHandler;
     private bool _loaded;
+    private MapData? _map;
 
     public MainPage(
         IMapDataProvider mapDataProvider,
@@ -32,11 +33,41 @@ public partial class MainPage : ContentPage
 
     private async Task LoadMapAsync()
     {
-        var map = await _mapDataProvider.GetMapDataAsync();
+        _map = await _mapDataProvider.GetMapDataAsync();
 
-        var board = new MapBoardView(map, _interactionState);
-        RootLayout.Insert(0, board); // pod legendą i wskaźnikiem
+        var board = new MapBoardView(_map, _interactionState);
+        RootLayout.Insert(0, board); // pod legendą, licznikami i wskaźnikiem
         LoadingIndicator.IsRunning = false;
         LoadingIndicator.IsVisible = false;
+
+        _interactionState.Changed += OnInteractionStateChanged;
+        UpdateCounters();
+    }
+
+    private void OnInteractionStateChanged(object? sender, EventArgs e) => UpdateCounters();
+
+    private void UpdateCounters()
+    {
+        if (_map is null)
+        {
+            return;
+        }
+
+        var selectedWagons = 0;
+        var doneWagons = 0;
+        foreach (var route in _map.Routes)
+        {
+            switch (_interactionState.GetRouteState(route.Id))
+            {
+                case RouteState.Selected:
+                    selectedWagons += route.WagonCount;
+                    break;
+                case RouteState.Done:
+                    doneWagons += route.WagonCount;
+                    break;
+            }
+        }
+
+        CountersLabel.Text = $"Zaznaczone / wykonane: {selectedWagons} / {doneWagons}";
     }
 }

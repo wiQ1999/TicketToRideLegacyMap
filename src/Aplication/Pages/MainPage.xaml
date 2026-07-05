@@ -32,6 +32,23 @@
                 Text="Tap miasta = oznacz/odznacz • Tap trasy = zaznaczona→wykonana→reset • Pinch = zoom • Pan = przesuń" />
         </Border>
 
+        <!-- Liczniki wagonów: zaznaczone / wykonane trasy. -->
+        <Border
+            Margin="12"
+            Padding="10,6"
+            HorizontalOptions="End"
+            VerticalOptions="Start"
+            BackgroundColor="#CC000000"
+            StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Label
+                x:Name="CountersLabel"
+                FontSize="11"
+                TextColor="White" />
+        </Border>
+
     </Grid>
 
 </ContentPage>
