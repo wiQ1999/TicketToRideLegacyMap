@@ -168,7 +168,7 @@ public sealed class MapBoardView : ContentView
     {
         try
         {
-            await using var stream = await FileSystem.OpenAppPackageFileAsync("map_background.png")
+            await using var stream = await FileSystem.OpenAppPackageFileAsync("map_background.jpg")
                 .ConfigureAwait(false);
             using var memory = new MemoryStream();
             await stream.CopyToAsync(memory).ConfigureAwait(false);
