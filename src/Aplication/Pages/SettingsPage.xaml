@@ -31,32 +31,32 @@
             <HorizontalStackLayout Spacing="10">
                 <Button
                     Text="Czarny"
-                    BackgroundColor="#212121"
-                    TextColor="White"
+                    BackgroundColor="{StaticResource TrainBlack}"
+                    TextColor="{StaticResource TrainWhite}"
                     Command="{Binding SelectColorCommand}"
                     CommandParameter="{x:Static models:WagonColor.Czarny}" />
                 <Button
                     Text="Czerwony"
-                    BackgroundColor="#C62828"
-                    TextColor="White"
+                    BackgroundColor="{StaticResource TrainRed}"
+                    TextColor="{StaticResource TrainWhite}"
                     Command="{Binding SelectColorCommand}"
                     CommandParameter="{x:Static models:WagonColor.Czerwony}" />
                 <Button
                     Text="Niebieski"
-                    BackgroundColor="#1565C0"
-                    TextColor="White"
+                    BackgroundColor="{StaticResource TrainBlue}"
+                    TextColor="{StaticResource TrainWhite}"
                     Command="{Binding SelectColorCommand}"
                     CommandParameter="{x:Static models:WagonColor.Niebieski}" />
                 <Button
                     Text="Zielony"
-                    BackgroundColor="#2E7D32"
-                    TextColor="White"
+                    BackgroundColor="{StaticResource TrainGreen}"
+                    TextColor="{StaticResource TrainWhite}"
                     Command="{Binding SelectColorCommand}"
                     CommandParameter="{x:Static models:WagonColor.Zielony}" />
                 <Button
                     Text="Żółty"
-                    BackgroundColor="#F9A825"
-                    TextColor="Black"
+                    BackgroundColor="{StaticResource TrainYellow}"
+                    TextColor="{StaticResource TrainBlack}"
                     Command="{Binding SelectColorCommand}"
                     CommandParameter="{x:Static models:WagonColor.Zolty}" />
             </HorizontalStackLayout>
