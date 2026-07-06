@@ -3,30 +3,250 @@
     x:Class="Aplication.Pages.MainMenuPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pm="clr-namespace:Aplication.PageModels"
+    x:DataType="pm:MainMenuPageModel"
+    Shell.NavBarIsVisible="False"
     Title="Wsiąść do pociągu">
 
-    <VerticalStackLayout
-        Padding="24"
-        Spacing="16"
-        HorizontalOptions="Center"
-        VerticalOptions="Center">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0.0" Color="{StaticResource Paper50}" />
+            <GradientStop Offset="0.55" Color="{StaticResource Paper200}" />
+            <GradientStop Offset="1.0" Color="{StaticResource Paper300}" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
-        <Label
-            FontSize="22"
-            FontAttributes="Bold"
-            HorizontalOptions="Center"
-            Text="Wsiąść do pociągu: Legendy zachodu" />
+    <ContentPage.Resources>
 
-        <Button
-            Text="Mapa gry"
-            WidthRequest="220"
-            Command="{Binding GoToMapCommand}" />
+        <LinearGradientBrush x:Key="RustButtonBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0.0" Color="{StaticResource Rust500}" />
+            <GradientStop Offset="1.0" Color="{StaticResource Rust600}" />
+        </LinearGradientBrush>
 
-        <Button
-            Text="Tryb deweloperski"
-            WidthRequest="220"
-            Command="{Binding GoToDeveloperCommand}" />
+        <LinearGradientBrush x:Key="GoldButtonBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0.0" Color="{StaticResource Gold400}" />
+            <GradientStop Offset="1.0" Color="{StaticResource Gold500}" />
+        </LinearGradientBrush>
 
-    </VerticalStackLayout>
+        <!-- Główny przycisk (rdzawy) — „Kontynuuj" -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource RustButtonBrush}" />
+            <Setter Property="TextColor" Value="{StaticResource Paper50}" />
+            <Setter Property="FontFamily" Value="{StaticResource FontUiBold}" />
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="HeightRequest" Value="54" />
+            <Setter Property="HorizontalOptions" Value="Fill" />
+        </Style>
+
+    </ContentPage.Resources>
+
+    <Grid ColumnDefinitions="1.05*,0.95*"
+          Padding="{OnIdiom Phone='28,20', Default='64,40'}"
+          ColumnSpacing="{OnIdiom Phone=24, Default=64}">
+
+        <!-- LEWA: branding -->
+        <VerticalStackLayout
+            Grid.Column="0"
+            VerticalOptions="Center"
+            Spacing="20"
+            MaximumWidthRequest="560">
+
+            <VerticalStackLayout Spacing="4">
+                <Label
+                    Text="WSIĄŚĆ DO POCIĄGU"
+                    FontFamily="{StaticResource FontDisplay}"
+                    FontSize="20"
+                    CharacterSpacing="1.2"
+                    TextColor="{StaticResource Sepia600}" />
+
+                <Label
+                    Text="Legendy&#10;Zachodu"
+                    FontFamily="{StaticResource FontDisplayBlack}"
+                    FontSize="{OnIdiom Phone=52, Default=70}"
+                    LineHeight="0.98"
+                    TextColor="{StaticResource Rust600}" />
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout Spacing="14">
+                <BoxView
+                    WidthRequest="52"
+                    HeightRequest="2"
+                    VerticalOptions="Center"
+                    Color="{StaticResource Gold500}" />
+                <Label
+                    Text="WERSJA LEGACY"
+                    FontFamily="{StaticResource FontUiSemibold}"
+                    FontSize="14"
+                    CharacterSpacing="2.6"
+                    VerticalOptions="Center"
+                    TextColor="{StaticResource Sepia600}" />
+            </HorizontalStackLayout>
+
+            <VerticalStackLayout Spacing="14" MaximumWidthRequest="420" HorizontalOptions="Start">
+                <Label
+                    FontFamily="{StaticResource FontBody}"
+                    FontSize="15"
+                    LineHeight="1.5"
+                    TextColor="{StaticResource Sepia600}"
+                    Text="Czeka cię wytężona rozgrywka — planuj trasy, buduj połączenia i realizuj bilety, zanim zrobią to rywale." />
+                <Label
+                    FontFamily="{StaticResource FontBody}"
+                    FontSize="15"
+                    LineHeight="1.5"
+                    TextColor="{StaticResource Sepia600}"
+                    Text="Wybierz kolor i wsiadaj." />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- PRAWA: panel sterowania -->
+        <Border
+            Grid.Column="1"
+            VerticalOptions="Center"
+            HorizontalOptions="Fill"
+            MaximumWidthRequest="470"
+            Padding="26"
+            BackgroundColor="{StaticResource Paper100}"
+            Stroke="{StaticResource Walnut700}"
+            StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="14" />
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="{StaticResource Walnut900}" Offset="0,8" Radius="26" Opacity="0.18" />
+            </Border.Shadow>
+
+            <VerticalStackLayout Spacing="0">
+
+                <Label
+                    Text="TWÓJ KOLOR"
+                    FontFamily="{StaticResource FontUiBold}"
+                    FontSize="13"
+                    CharacterSpacing="2.6"
+                    TextColor="{StaticResource Walnut900}" />
+
+                <!-- Kafelki kolorów: zaokrąglone kwadraty, rozłożone równomiernie -->
+                <FlexLayout
+                    Margin="0,16,0,0"
+                    JustifyContent="SpaceBetween"
+                    Wrap="NoWrap"
+                    BindableLayout.ItemsSource="{Binding Colors}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="pm:ColorChoice">
+                            <VerticalStackLayout Spacing="9" HorizontalOptions="Center">
+                                <Grid WidthRequest="60" HeightRequest="60" HorizontalOptions="Center">
+                                    <!-- Próbka koloru -->
+                                    <Border
+                                        WidthRequest="54"
+                                        HeightRequest="54"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        Padding="0"
+                                        BackgroundColor="{Binding Swatch}"
+                                        Stroke="{StaticResource Walnut700}"
+                                        StrokeThickness="1">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12" />
+                                        </Border.StrokeShape>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding SelectCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                    <!-- Znacznik wyboru -->
+                                    <Path
+                                        IsVisible="{Binding IsSelected}"
+                                        InputTransparent="True"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        Data="M2,9 L7,14 L16,3"
+                                        Stroke="{StaticResource Paper50}"
+                                        StrokeThickness="3"
+                                        StrokeLineCap="Round"
+                                        StrokeLineJoin="Round" />
+                                </Grid>
+                                <Label
+                                    Text="{Binding Label}"
+                                    FontFamily="{StaticResource FontUiSemibold}"
+                                    FontSize="11"
+                                    HorizontalOptions="Center"
+                                    TextColor="{StaticResource Sepia600}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource Walnut900}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+
+                <BoxView
+                    Margin="0,24,0,20"
+                    HeightRequest="1"
+                    Color="{StaticResource Walnut900}"
+                    Opacity="0.18" />
+
+                <!-- Kontynuuj: tylko gdy trwa rozgrywka -->
+                <Button
+                    Text="Kontynuuj →"
+                    IsVisible="{Binding HasActivePlan}"
+                    Margin="0,0,0,12"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding ContinueCommand}" />
+
+                <!-- Nowy plan: rdzawy CTA gdy brak planu, złoty gdy plan trwa -->
+                <Button
+                    Text="Nowy plan"
+                    Command="{Binding NewPlanCommand}"
+                    Background="{StaticResource GoldButtonBrush}"
+                    TextColor="{StaticResource Walnut900}"
+                    FontFamily="{StaticResource FontUiBold}"
+                    FontSize="16"
+                    CornerRadius="8"
+                    HeightRequest="46"
+                    HorizontalOptions="Fill">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding HasActivePlan}" Value="False">
+                            <Setter Property="Background" Value="{StaticResource RustButtonBrush}" />
+                            <Setter Property="TextColor" Value="{StaticResource Paper50}" />
+                            <Setter Property="HeightRequest" Value="54" />
+                            <Setter Property="FontSize" Value="17" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <Label
+                    Text="Wybierz kolor, aby rozpocząć."
+                    IsVisible="{Binding ShowNewPlanHint}"
+                    Margin="0,8,0,0"
+                    FontFamily="{StaticResource FontBody}"
+                    FontSize="11"
+                    HorizontalOptions="Center"
+                    TextColor="{StaticResource Sepia600}" />
+
+                <BoxView
+                    Margin="0,18,0,0"
+                    HeightRequest="1"
+                    Color="{StaticResource Walnut900}"
+                    Opacity="0.1" />
+
+                <!-- Tryb deweloperski: dyskretne wejście -->
+                <Button
+                    Text="⌘ Tryb deweloperski"
+                    Margin="0,10,0,0"
+                    BackgroundColor="Transparent"
+                    FontFamily="{StaticResource FontUiSemibold}"
+                    FontSize="11"
+                    TextColor="{StaticResource Sepia600}"
+                    Command="{Binding GoToDeveloperCommand}" />
+
+            </VerticalStackLayout>
+        </Border>
+
+    </Grid>
 
 </ContentPage>

@@ -15,6 +15,9 @@ public interface IMapInteractionState
     /// <summary>Aktualnie wybrany kolor wagonów gracza.</summary>
     WagonColor WagonColor { get; }
 
+    /// <summary>Czy w tej sesji rozpoczęto już rozgrywkę (umożliwia „Kontynuuj").</summary>
+    bool HasActivePlan { get; }
+
     /// <summary>Czy miasto jest oznaczone.</summary>
     bool IsCityMarked(string cityId);
 
@@ -29,6 +32,9 @@ public interface IMapInteractionState
 
     /// <summary>Ustawia kolor wagonów gracza i zgłasza <see cref="Changed"/>.</summary>
     void SetWagonColor(WagonColor color);
+
+    /// <summary>Rozpoczyna nową rozgrywkę: czyści oznaczenia, ustawia kolor, oznacza plan jako aktywny.</summary>
+    void StartNewPlan(WagonColor color);
 
     /// <summary>Czyści wszystkie oznaczenia miast oraz stany tras i zgłasza <see cref="Changed"/>.</summary>
     void ResetMarks();

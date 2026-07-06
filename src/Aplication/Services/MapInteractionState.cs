@@ -13,6 +13,8 @@ public sealed class MapInteractionState : IMapInteractionState
 
     public WagonColor WagonColor { get; private set; } = PickRandomColor();
 
+    public bool HasActivePlan { get; private set; }
+
     public bool IsCityMarked(string cityId) => _markedCities.Contains(cityId);
 
     public void ToggleCity(string cityId)
@@ -43,6 +45,15 @@ public sealed class MapInteractionState : IMapInteractionState
     public void SetWagonColor(WagonColor color)
     {
         WagonColor = color;
+        RaiseChanged();
+    }
+
+    public void StartNewPlan(WagonColor color)
+    {
+        _markedCities.Clear();
+        _routeStates.Clear();
+        WagonColor = color;
+        HasActivePlan = true;
         RaiseChanged();
     }
 
