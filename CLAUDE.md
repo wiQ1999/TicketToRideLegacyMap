@@ -8,9 +8,9 @@ Aplikacja-towarzysz (.NET MAUI) do gry planszowej **„Wsiąść do pociągu: Le
 Wyświetla interaktywną planszę (miasta + trasy), pozwala oznaczać miasta i przełączać stany tras.
 Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłącznie orientacja landscape.
 
-> **Status:** zrealizowane wszystkie etapy poza końcowym (patrz [plan-etapow.md](docs/plan-etapow.md)).
-> Wgrany jest pełny podkład planszy i **61 miast** (`mapa.json`), ale **lista tras jest jeszcze pusta**
-> (uzupełniana ręcznie w trybie deweloperskim), a pozycje miast to przybliżenie odczytane z podkładu.
+> **Status:** przygotowana podstawowa wersja aplikacji. Wgrany jest pełny podkład planszy i **61 miast**
+> (`mapa.json`), ale **lista tras jest jeszcze pusta** (uzupełniana ręcznie w trybie deweloperskim),
+> a pozycje miast to przybliżenie odczytane z podkładu.
 > Wygląd (kolory, kształty) wciąż może się zmieniać — nie przywiązuj się do jego szczegółów.
 
 ## Dokumentacja (czytaj najpierw)
@@ -18,7 +18,6 @@ Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłą
 - [docs/specyfikacja-aplikacji.md](docs/specyfikacja-aplikacji.md) — wymagania biznesowe (źródło prawdy o zakresie).
 - [docs/architektura.md](docs/architektura.md) — architektura docelowa: warstwy, modele, nawigacja.
 - [docs/renderowanie-mapy.md](docs/renderowanie-mapy.md) — technologia UI i strategia renderowania planszy.
-- [docs/plan-etapow.md](docs/plan-etapow.md) — roadmapa etapów.
 
 > Dokumenty opisują architekturę **docelową** i miejscami rozjeżdżają się z nazwami w kodzie — najważniejsze:
 > serwis stanu rozgrywki to `IMapInteractionState`/`MapInteractionState` (nie `GameStateService`), a `MapPage`
