@@ -77,8 +77,11 @@ Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec *
 - **`ICityNameCatalog`** — stała, wbudowana lista nazw miast z fizycznej gry; źródło podpowiedzi
   zarówno dla wyszukiwania (2.7), jak i dodawania miast w trybie deweloperskim (2.8).
 - **`GameStateService`** (singleton) — w pamięci: oznaczone miasta, stany tras, `WagonColor`,
-  wyliczane liczniki wagonów (2.4). Metody: `ToggleCity`, `CycleRoute`, `SetWagonColor`, `ResetGame`.
-  Konstruktor nie ładuje zapisanego stanu (3.2).
+  wyliczane liczniki wagonów (2.4). Metody: `ToggleCity`, `CycleRoute`, `SetWagonColor`,
+  `StartNewPlan` (nowa rozgrywka z menu: czyści oznaczenia + ustawia kolor + zaznacza aktywny plan),
+  `ResetGame`; właściwość `HasActivePlan` (czy w sesji rozpoczęto rozgrywkę — steruje opcją
+  „Kontynuuj" w menu). `WagonColor` jest losowany przy starcie serwisu. Konstruktor nie ładuje
+  zapisanego stanu (3.2).
 - **`IDeveloperMapEditor`** — robocze listy miast/tras trybu deweloperskiego; przy starcie
   inicjalizowane danymi z `IMapDataProvider`. Operacje: dodaj/edytuj/usuń miasto, dodaj/edytuj/usuń
   trasę (2.8).
@@ -87,7 +90,10 @@ Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec *
 
 ### 3.3 Warstwa page-modeli (`PageModels/`)
 
-- **`MainMenuPageModel`** — komendy nawigacji do trybu mapy i trybu deweloperskiego.
+- **`MainMenuPageModel`** — wybór koloru wagonów (kafelki `ColorChoice`), rozpoczęcie nowej
+  rozgrywki (`NewPlanCommand` → `StartNewPlan`, aktywne dopiero po wyborze koloru) lub kontynuacja
+  trwającej (`ContinueCommand`, widoczne przy `HasActivePlan`), przejście do trybu deweloperskiego.
+  Domyślnie zaznaczony jest bieżący `WagonColor`.
 - **`MapPageModel`** — projekcja `GameStateService`; `ToggleCityCommand`, `CycleRouteCommand`;
   liczniki (2.4); pole i podpowiedzi wyszukiwania miasta z `ICityNameCatalog`, komenda
   `SelectSearchResultCommand` (zoom-to-city + oznaczenie, 2.7); nawigacja do ustawień.
@@ -97,7 +103,9 @@ Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec *
 
 ### 3.4 Warstwa widoków (`Pages/`)
 
-- **`MainMenuPage`** — wybór trybu: mapa / tryb deweloperski.
+- **`MainMenuPage`** — menu główne (landscape): branding, wybór koloru wagonów, „Nowy plan"
+  (nowa rozgrywka) / „Kontynuuj" (gdy trwa rozgrywka), dyskretne wejście w tryb deweloperski.
+  Odświeża stan w `OnAppearing` (po powrocie z mapy pojawia się „Kontynuuj").
 - **`MapPage`** — plansza z gestami **pinch-to-zoom** i **pan** (2.1), pole wyszukiwania miasta
   z listą podpowiedzi (2.7), nakładka z licznikami, przejście do ustawień. Rendering: `GraphicsView`
   jak w [renderowanie-mapy.md](renderowanie-mapy.md).
@@ -112,7 +120,7 @@ Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec *
 
 | Ekran | Page / PageModel | Zawartość | Źródło wymagań |
 |---|---|---|---|
-| **Główne menu** | `MainMenuPage` / `MainMenuPageModel` | Wybór trybu: mapa gry / tryb deweloperski. | 2.8 |
+| **Główne menu** | `MainMenuPage` / `MainMenuPageModel` | Wybór koloru wagonów, „Nowy plan" (nowa rozgrywka) / „Kontynuuj" (gdy trwa) → mapa, tryb deweloperski. | 2.2, 2.5, 2.8 |
 | **Widok mapy** | `MapPage` / `MapPageModel` | Plansza, gesty zoom/pan, oznaczanie miast/tras, liczniki, wyszukiwanie miasta, wejście do ustawień. | 2.1, 2.3, 2.4, 2.7 |
 | **Widok ustawień / działań** | `SettingsPage` / `SettingsPageModel` | „Nowa rozgrywka", zmiana koloru wagonów. | 2.5 |
 | **Tryb deweloperski** | `DeveloperPage` / `DeveloperPageModel` | Robocze listy miast/tras, dodawanie przez wskazanie na mapie + formularz, edycja/usuwanie, eksport JSON. | 2.8 |
@@ -124,14 +132,16 @@ Brak ekranu pomocy/onboardingu (3.4).
 ## 5. Nawigacja
 
 - **Mechanizm:** .NET MAUI Shell, `Shell.FlyoutBehavior="Disabled"`.
-- **Model nawigacji:** `MainMenuPage` jest ekranem głównym (root) z wyborem trybu. `SettingsPage`
-  dostępny wyłącznie z `MapPage` przez jawną akcję nawigacyjną (2.5 — akcje destrukcyjne nie są
-  dostępne bezpośrednio z mapy).
+- **Model nawigacji:** `MainMenuPage` jest ekranem głównym (root): wybór koloru i rozpoczęcie/
+  kontynuacja rozgrywki (→ `MapPage`) albo wejście w tryb deweloperski. `SettingsPage` dostępny
+  wyłącznie z `MapPage` przez jawną akcję nawigacyjną (2.5 — akcje destrukcyjne nie są dostępne
+  bezpośrednio z mapy).
 
 ```
 MainMenuPage (root, "//menu")
-   │  GoToAsync("map")            │  GoToAsync("developer")
-   ▼                              ▼
+   │  „Nowy plan" / „Kontynuuj"    │  „Tryb deweloperski"
+   │  GoToAsync("map")             │  GoToAsync("developer")
+   ▼                               ▼
 MapPage ("map")                DeveloperPage ("developer")
    │  GoToAsync("settings")
    ▼
@@ -163,11 +173,12 @@ src/Aplication/
 │                 IMapInteractionState/MapInteractionState (stan rozgrywki, dalej „GameStateService"),
 │                 ICityNameCatalog/CityNameCatalog, IDeveloperMapEditor/DeveloperMapEditor,
 │                 IMapDataExporter/MapDataExporter, IErrorHandler/ModalErrorHandler
-├── PageModels/   MainMenuPageModel, SettingsPageModel, DeveloperPageModel  (MapPage → code-behind)
+├── PageModels/   MainMenuPageModel (+ ColorChoice), SettingsPageModel, DeveloperPageModel  (MapPage → code-behind)
 ├── Pages/        MainMenuPage, MapPage, SettingsPage, DeveloperPage  (.xaml / .cs)
 ├── Controls/     MapBoardView  (host GraphicsView + gesty)
 ├── Rendering/    MapDrawable, MapViewport, MapHitTester, MapMetrics, RouteColorPalette
-├── Resources/    Styles, Fonts, AppIcon, Splash; Raw/ (mapa.json + podkład graficzny)
+├── Resources/    Styles (design system: Colors, Typography, Styles, AppStyles), Fonts (Cinzel/
+│                 Cinzel Decorative/Bitter + Licenses), AppIcon, Splash; Raw/ (mapa.json + podkład)
 └── Platforms/    Android, iOS, MacCatalyst, Windows  (wymuszenie landscape)
 ```
 

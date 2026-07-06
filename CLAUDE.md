@@ -31,6 +31,19 @@ Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłą
 - Target frameworki: `net10.0-android` (+ `-ios`, `-maccatalyst`; `-windows...` tylko na Windows).
 - Domyślna powłoka: PowerShell (Windows); dostępny też Bash. Dane mapy i podkład: `src/Aplication/Resources/Raw/`.
 
+## Praca nad UI
+
+- **Nie rób samodzielnie zrzutów ekranu** aplikacji (uruchamianie okna i przechwytywanie) do oceny
+  wyglądu. Zamiast tego **poproś użytkownika o przesłanie zrzutu** — do porównania z mockupem i
+  wizualnej weryfikacji zmian. Build służy tylko do wykrywania błędów kompilacji/XAML; zgodność
+  wizualną potwierdza użytkownik.
+- Design system „Legendy Zachodu" jest **współdzielony przez wszystkie widoki**: paleta kolorów w
+  `Resources/Styles/Colors.xaml`, tokeny czcionek w `Resources/Styles/Typography.xaml`
+  (Cinzel / Cinzel Decorative / Bitter — zarejestrowane w `MauiProgram.cs`, pliki `.ttf` w
+  `Resources/Fonts/`, licencje OFL w `Resources/Fonts/Licenses/`). Stosuj tokeny
+  (`{StaticResource ...}`) zamiast wpisywać kolory/rodziny czcionek na sztywno.
+- Mockupy widoków (PDF) leżą w `docs/mockups/`.
+
 ## Architektura renderowania (big picture)
 
 Szczegóły w [renderowanie-mapy.md](docs/renderowanie-mapy.md); w skrócie:
