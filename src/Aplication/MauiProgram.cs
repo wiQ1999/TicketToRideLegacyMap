@@ -16,6 +16,17 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 fonts.AddFont("SegoeUI-Semibold.ttf", "SegoeSemibold");
+
+                // Legendy Zachodu — design system typefaces (patrz Resources/Styles/Typography.xaml).
+                fonts.AddFont("Cinzel-Regular.ttf", "CinzelRegular");
+                fonts.AddFont("Cinzel-Bold.ttf", "CinzelBold");
+                fonts.AddFont("Cinzel-Black.ttf", "CinzelBlack");
+                fonts.AddFont("CinzelDecorative-Regular.ttf", "CinzelDecorativeRegular");
+                fonts.AddFont("CinzelDecorative-Bold.ttf", "CinzelDecorativeBold");
+                fonts.AddFont("CinzelDecorative-Black.ttf", "CinzelDecorativeBlack");
+                fonts.AddFont("Bitter-Regular.ttf", "BitterRegular");
+                fonts.AddFont("Bitter-SemiBold.ttf", "BitterSemibold");
+                fonts.AddFont("Bitter-Bold.ttf", "BitterBold");
             });
 
 #if DEBUG

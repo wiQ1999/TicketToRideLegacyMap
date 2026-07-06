@@ -33,6 +33,77 @@
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
 
+    <!-- Wagony / trasy (kolory kanoniczne z planszy) -->
+    <Color x:Key="TrainBlack">#26241F</Color>
+    <Color x:Key="TrainRed">#C63A2B</Color>
+    <Color x:Key="TrainBlue">#2E6FA6</Color>
+    <Color x:Key="TrainGreen">#4F9E4C</Color>
+    <Color x:Key="TrainYellow">#E7B12B</Color>
+    <Color x:Key="TrainWhite">#EFE8D6</Color>
+    <Color x:Key="TrainGray">#9E9585</Color>
+
+    <!-- Miasto (kropki na planszy) -->
+    <Color x:Key="CityNode">#7E2B24</Color>
+    <Color x:Key="CityRing">#E7D9B8</Color>
+
+    <!-- Teren planszy -->
+    <Color x:Key="MapLand">#C4A56A</Color>
+    <Color x:Key="MapLandOlive">#A79E5C</Color>
+    <Color x:Key="MapDesert">#C46A3C</Color>
+    <Color x:Key="MapWater">#35707E</Color>
+    <Color x:Key="MapWaterDeep">#295A66</Color>
+
+    <!-- Pergamin / papier (powierzchnie) -->
+    <Color x:Key="Paper50">#FBF5E7</Color>
+    <Color x:Key="Paper100">#F7EFDD</Color>
+    <Color x:Key="Paper200">#F0E4CB</Color>
+    <Color x:Key="Paper300">#E6D5B8</Color>
+    <Color x:Key="Paper400">#D9C3A0</Color>
+    <Color x:Key="Paper500">#C9AE82</Color>
+
+    <!-- Drewno / skóra / atrament (brązy) -->
+    <Color x:Key="Walnut900">#2A1D11</Color>
+    <Color x:Key="Walnut800">#3B2917</Color>
+    <Color x:Key="Walnut700">#4A3420</Color>
+    <Color x:Key="Sepia600">#6B4A2B</Color>
+    <Color x:Key="Saddle500">#8B5E34</Color>
+    <Color x:Key="Saddle400">#A9794A</Color>
+
+    <!-- Akcenty marki -->
+    <Color x:Key="Rust700">#8C2F1D</Color>
+    <Color x:Key="Rust600">#A63A24</Color>
+    <Color x:Key="Rust500">#BF4A31</Color>
+    <Color x:Key="Gold600">#B27D22</Color>
+    <Color x:Key="Gold500">#C8912B</Color>
+    <Color x:Key="Gold400">#DBAA47</Color>
+
+    <!-- Akcent teal (z mórz na planszy) -->
+    <Color x:Key="Teal600">#295A66</Color>
+    <Color x:Key="Teal500">#35707E</Color>
+    <Color x:Key="Teal400">#4E8C99</Color>
+
+    <!-- Stan interakcji (cykl dotknięć trasy) -->
+    <Color x:Key="StateSelected">#C8912B</Color>
+    <Color x:Key="StateDoneVeil">#8C2A1D11</Color>
+
+    <!-- Informacja zwrotna -->
+    <Color x:Key="Success600">#3E7C4F</Color>
+    <Color x:Key="Danger600">#A63A24</Color>
+
+    <!-- Aliasy semantyczne -->
+    <Color x:Key="SurfacePage">#F0E4CB</Color>
+    <Color x:Key="SurfacePanel">#F7EFDD</Color>
+    <Color x:Key="SurfaceRaised">#FBF5E7</Color>
+    <Color x:Key="SurfaceSunken">#E6D5B8</Color>
+    <Color x:Key="SurfaceInk">#2A1D11</Color>
+
+    <Color x:Key="BorderHair">#242A1D11</Color>
+    <Color x:Key="BorderDefault">#472A1D11</Color>
+    <Color x:Key="BorderStrong">#4A3420</Color>
+
+    <Color x:Key="Accent">#A63A24</Color>
+    <Color x:Key="AccentGold">#C8912B</Color>
+
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
