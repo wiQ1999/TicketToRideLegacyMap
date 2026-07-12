@@ -25,7 +25,7 @@ Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłą
 
 ## Budowanie i uruchamianie
 
-- Brak pliku `.sln` — buduj projekt bezpośrednio. Brak testów automatycznych w repo.
+- Solution: `src/TicketToRideLegacyMap.slnx` (format `.slnx`, nie `.sln`). Brak testów automatycznych w repo.
 - Szybki sanity-build (Windows, używany w tej sesji):
   `dotnet build "src/Aplication/Aplication.csproj" -f net10.0-windows10.0.19041.0 -c Debug`
 - Target frameworki: `net10.0-android` (+ `-ios`, `-maccatalyst`; `-windows...` tylko na Windows).
@@ -50,6 +50,10 @@ Szczegóły w [renderowanie-mapy.md](docs/renderowanie-mapy.md); w skrócie:
 
 - Cała plansza rysowana wektorowo w **jednym `IDrawable`** (`Rendering/MapDrawable`) w kontrolce
   `GraphicsView`, hostowanej przez `Controls/MapBoardView` (gesty pinch/pan/tap → `Invalidate()`).
+  **Gotcha:** multi-touch pinch/pan na `GraphicsView` jest zawodny na Androidzie (ograniczenie MAUI;
+  działa na Windows, więc sanity-build tego nie wykryje). Pewne przybliżanie to przyciski **+/−**
+  (`MapBoardView.ZoomIn`/`ZoomOut`); docelowa naprawa = natywny dotyk w handlerze. Naprawa świadomie
+  odłożona przez użytkownika — nie ruszać bez prośby.
 - Geometria żyje w **przestrzeni mapy**; `Rendering/MapViewport` mapuje mapa↔ekran i jest **wspólny**
   dla rysowania oraz hit-testingu (`Rendering/MapHitTester`) — co widać, to jest klikalne.
 - Renderer jest **bezstanowy**: przy każdym `Draw` odpytuje `Services/IMapInteractionState`

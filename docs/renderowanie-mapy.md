@@ -48,13 +48,21 @@ Scale    = fitScale
 - **Pinch:** skalowanie wokół punktu między palcami (punkt mapy pod gestem pozostaje nieruchomy).
 - **Pan:** przesuwa `Offset` z clampem, tak by plansza nie zniknęła całkowicie z kadru.
 
+> **Uwaga — gesty na Androidzie:** multi-touch pinch (i pan dwoma palcami) przez
+> `PinchGestureRecognizer`/`PanGestureRecognizer` na `GraphicsView` jest na Androidzie zawodny
+> (ograniczenie MAUI — na Windows działa, więc sanity-build tego nie wychwytuje). Pewne
+> przybliżanie/oddalanie zapewniają przyciski **+/−** (`MapBoardView.ZoomIn`/`ZoomOut`). Docelowa
+> naprawa: natywny dotyk w handlerze `GraphicsView` (Android `ScaleGestureDetector`, iOS
+> `UIPinchGestureRecognizer`).
+
 ---
 
 ## 3. Warstwy i geometria elementów
 
 `Draw` rysuje w kolejności: **1) tło → 2) trasy → 3) miasta**. Tło to opcjonalna **bitmapa podkładu**
-(`canvas.DrawImage` z tą samą transformacją) albo jednolity kolor, gdy podkładu brak. Liczniki i legenda (2.4)
-są poza kanwą — jako elementy XAML w nakładce nad `GraphicsView`, niezależne od zoomu.
+(`canvas.DrawImage` z tą samą transformacją) albo jednolity kolor, gdy podkładu brak. Liczniki (2.4),
+pole wyszukiwania (2.7) i przyciski przybliżania/oddalania (2.1) są poza kanwą — jako elementy XAML
+w nakładce nad pełnoekranowym `GraphicsView`, niezależne od zoomu.
 
 - **Miasto** — punkt `(X, Y)` w przestrzeni mapy. Nazwa miasta **nie jest rysowana na mapie** — służy
   wyłącznie wyszukiwaniu (2.7) i trybowi deweloperskiemu (2.8), poza kanwą.
