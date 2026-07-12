@@ -10,13 +10,20 @@ public sealed class MapViewport(double mapWidth, double mapHeight)
     /// <summary>Maksymalne powiększenie względem widoku „z lotu ptaka".</summary>
     public const double MaxZoom = 8.0;
 
+    /// <summary>
+    /// Ułamek wymiaru kadru, który musi pozostać pokryty planszą przy przesuwaniu — dolna granica
+    /// widoczności, dzięki której użytkownik nie „zgubi" mapy poza ekranem. Poza nią pan jest
+    /// swobodny, więc rogi planszy można odsunąć od narożników zasłanianych przez nakładkę UI.
+    /// </summary>
+    private const double MinVisibleFraction = 0.15;
+
     public double MapWidth { get; } = mapWidth;
     public double MapHeight { get; } = mapHeight;
 
     public double ViewWidth { get; private set; }
     public double ViewHeight { get; private set; }
 
-    /// <summary>Skala dopasowania całej planszy do kadru — dolny limit zoomu.</summary>
+    /// <summary>Skala dopasowania całej planszy do kadru — dolny limit zoomu i domyślny widok „z lotu ptaka".</summary>
     public double FitScale { get; private set; } = 1.0;
 
     public double Scale { get; private set; } = 1.0;
@@ -94,8 +101,9 @@ public sealed class MapViewport(double mapWidth, double mapHeight)
     }
 
     /// <summary>
-    /// Utrzymuje co najmniej fragment planszy w kadrze. Gdy plansza jest mniejsza od kadru
-    /// w danej osi (po wpasowaniu), pozostaje wyśrodkowana w tej osi.
+    /// Utrzymuje w kadrze co najmniej fragment planszy (<see cref="MinVisibleFraction"/> wymiaru
+    /// kadru). Poza tym przesuwanie jest swobodne — użytkownik może odsunąć rogi planszy od
+    /// narożników zajętych przez nakładkę UI, nie tracąc mapy z ekranu.
     /// </summary>
     private void ClampOffset()
     {
@@ -105,13 +113,10 @@ public sealed class MapViewport(double mapWidth, double mapHeight)
 
     private static double ClampAxis(double offset, double contentSize, double viewSize)
     {
-        if (contentSize <= viewSize)
-        {
-            return (viewSize - contentSize) / 2.0;
-        }
-
-        // Nie pozwól odsłonić pustego marginesu poza planszą.
-        var min = viewSize - contentSize;
-        return Math.Clamp(offset, min, 0);
+        // Ile planszy musi zostać widoczne w tej osi — nie więcej niż cała plansza.
+        var keep = Math.Min(viewSize * MinVisibleFraction, contentSize);
+        var min = keep - contentSize;
+        var max = viewSize - keep;
+        return Math.Clamp(offset, min, max);
     }
 }
