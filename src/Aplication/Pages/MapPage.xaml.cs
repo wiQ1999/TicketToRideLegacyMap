@@ -40,7 +40,7 @@ public partial class MapPage : ContentPage
         _map = await _mapDataProvider.GetMapDataAsync();
 
         _board = new MapBoardView(_map, _interactionState);
-        RootLayout.Insert(0, _board); // pod legendą, licznikami, wyszukiwarką i wskaźnikiem
+        RootLayout.Insert(0, _board); // pod licznikami, wyszukiwarką, guzikami zoomu i wskaźnikiem
         LoadingIndicator.IsRunning = false;
         LoadingIndicator.IsVisible = false;
 
@@ -50,8 +50,42 @@ public partial class MapPage : ContentPage
 
     private void OnInteractionStateChanged(object? sender, EventArgs e) => UpdateCounters();
 
-    private void OnSettingsClicked(object? sender, EventArgs e) =>
-        Shell.Current.GoToAsync("settings").FireAndForgetSafeAsync(_errorHandler);
+    private void OnZoomInTapped(object? sender, TappedEventArgs e) => _board?.ZoomIn();
+
+    private void OnZoomOutTapped(object? sender, TappedEventArgs e) => _board?.ZoomOut();
+
+    private void OnSearchButtonTapped(object? sender, TappedEventArgs e) => SetSearchExpanded(true);
+
+    private void OnCitySearchUnfocused(object? sender, FocusEventArgs e)
+    {
+        // Zwiń po utracie focusu — z opóźnieniem, bo tap w podpowiedź najpierw odbiera focus polu.
+        Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(200), () =>
+        {
+            if (SearchExpanded.IsVisible && !CitySearchEntry.IsFocused)
+            {
+                SetSearchExpanded(false);
+            }
+        });
+    }
+
+    private void SetSearchExpanded(bool expanded)
+    {
+        SearchExpanded.IsVisible = expanded;
+        CollapsedSearchButton.IsVisible = !expanded;
+
+        if (expanded)
+        {
+            Dispatcher.Dispatch(() => CitySearchEntry.Focus());
+            return;
+        }
+
+        _suppressSearchTextChanged = true;
+        CitySearchEntry.Text = string.Empty;
+        _suppressSearchTextChanged = false;
+        ClearSearchButton.IsVisible = false;
+        CitySearchResults.ItemsSource = null;
+        CitySearchResultsPanel.IsVisible = false;
+    }
 
     private void OnCitySearchTextChanged(object? sender, TextChangedEventArgs e)
     {
@@ -60,11 +94,13 @@ public partial class MapPage : ContentPage
             return;
         }
 
+        ClearSearchButton.IsVisible = !string.IsNullOrEmpty(e.NewTextValue);
+
         var query = e.NewTextValue?.Trim();
         if (string.IsNullOrEmpty(query))
         {
             CitySearchResults.ItemsSource = null;
-            CitySearchResults.IsVisible = false;
+            CitySearchResultsPanel.IsVisible = false;
             return;
         }
 
@@ -76,7 +112,13 @@ public partial class MapPage : ContentPage
             .ToList();
 
         CitySearchResults.ItemsSource = matches;
-        CitySearchResults.IsVisible = matches.Count > 0;
+        CitySearchResultsPanel.IsVisible = matches.Count > 0;
+    }
+
+    private void OnClearSearchTapped(object? sender, TappedEventArgs e)
+    {
+        CitySearchEntry.Text = string.Empty;
+        CitySearchEntry.Focus();
     }
 
     private void OnCitySearchResultSelected(object? sender, SelectionChangedEventArgs e)
@@ -87,12 +129,6 @@ public partial class MapPage : ContentPage
         }
 
         CitySearchResults.SelectedItem = null;
-        CitySearchResults.ItemsSource = null;
-        CitySearchResults.IsVisible = false;
-
-        _suppressSearchTextChanged = true;
-        CitySearchEntry.Text = city.Name;
-        _suppressSearchTextChanged = false;
 
         _board.CenterOnCity(city);
 
@@ -100,6 +136,8 @@ public partial class MapPage : ContentPage
         {
             _interactionState.ToggleCity(city.Id);
         }
+
+        SetSearchExpanded(false);
     }
 
     private void UpdateCounters()
@@ -124,6 +162,7 @@ public partial class MapPage : ContentPage
             }
         }
 
-        CountersLabel.Text = $"Zaznaczone / wykonane: {selectedWagons} / {doneWagons}";
+        SelectedCountLabel.Text = selectedWagons.ToString();
+        DoneCountLabel.Text = doneWagons.ToString();
     }
 }

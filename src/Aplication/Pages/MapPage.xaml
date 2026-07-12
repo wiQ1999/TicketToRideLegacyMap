@@ -3,15 +3,13 @@
     x:Class="Aplication.Pages.MapPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:Aplication.Models"
+    Shell.NavBarIsVisible="False"
     Title="Mapa">
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Ustawienia" Clicked="OnSettingsClicked" />
-    </ContentPage.ToolbarItems>
 
     <Grid x:Name="RootLayout">
 
-        <!-- Plansza (MapBoardView) jest wstawiana w kodzie po wczytaniu danych. -->
+        <!-- Plansza (MapBoardView) jest wstawiana w kodzie po wczytaniu danych i wypełnia cały ekran. -->
 
         <ActivityIndicator
             x:Name="LoadingIndicator"
@@ -19,67 +17,298 @@
             VerticalOptions="Center"
             IsRunning="True" />
 
-        <!-- Krótka legenda: interakcja i gesty widoku mapy. -->
+        <!-- Wyszukiwanie miasta — stan zwinięty: sama lupka; kliknięcie rozwija pole tekstowe. -->
         <Border
-            Margin="12"
-            Padding="10,6"
+            x:Name="CollapsedSearchButton"
+            Margin="16"
             HorizontalOptions="Start"
             VerticalOptions="Start"
-            BackgroundColor="#CC000000"
-            StrokeThickness="0">
+            WidthRequest="52"
+            HeightRequest="52"
+            Padding="0"
+            BackgroundColor="{StaticResource Paper50}"
+            Stroke="{StaticResource BorderDefault}"
+            StrokeThickness="1">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="8" />
+                <RoundRectangle CornerRadius="26" />
             </Border.StrokeShape>
-            <Label
-                FontSize="11"
-                TextColor="White"
-                Text="Tap miasta = oznacz/odznacz • Tap trasy = zaznaczona→wykonana→reset • Pinch = zoom • Pan = przesuń" />
+            <Border.Shadow>
+                <Shadow Brush="{StaticResource Walnut900}" Offset="0,4" Radius="16" Opacity="0.16" />
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnSearchButtonTapped" />
+            </Border.GestureRecognizers>
+            <Path
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HeightRequest="24"
+                WidthRequest="24"
+                Aspect="Uniform"
+                Data="M9,2 A7,7 0 1 0 9,16 A7,7 0 1 0 9,2 M14,14 L20,20"
+                Stroke="{StaticResource Sepia600}"
+                StrokeThickness="2"
+                StrokeLineCap="Round" />
         </Border>
 
-        <!-- Liczniki wagonów: zaznaczone / wykonane trasy. -->
-        <Border
-            Margin="12"
-            Padding="10,6"
+        <!-- Wyszukiwanie miasta — stan rozwinięty: pole tekstowe + podpowiedzi (zwykły tekst), wybór = zoom + oznaczenie. -->
+        <VerticalStackLayout
+            x:Name="SearchExpanded"
+            IsVisible="False"
+            Margin="16"
+            HorizontalOptions="Start"
+            VerticalOptions="Start"
+            WidthRequest="300"
+            Spacing="6">
+
+            <Border
+                BackgroundColor="{StaticResource Paper50}"
+                Stroke="{StaticResource BorderDefault}"
+                StrokeThickness="1"
+                Padding="14,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Walnut900}" Offset="0,4" Radius="16" Opacity="0.16" />
+                </Border.Shadow>
+
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+
+                    <!-- Ikona lupy -->
+                    <Path
+                        Grid.Column="0"
+                        VerticalOptions="Center"
+                        HeightRequest="18"
+                        WidthRequest="18"
+                        Aspect="Uniform"
+                        Data="M9,2 A7,7 0 1 0 9,16 A7,7 0 1 0 9,2 M14,14 L20,20"
+                        Stroke="{StaticResource Sepia600}"
+                        StrokeThickness="2"
+                        StrokeLineCap="Round" />
+
+                    <Entry
+                        x:Name="CitySearchEntry"
+                        Grid.Column="1"
+                        HeightRequest="48"
+                        BackgroundColor="Transparent"
+                        FontFamily="{StaticResource FontBody}"
+                        FontSize="16"
+                        TextColor="{StaticResource Walnut900}"
+                        PlaceholderColor="{StaticResource Saddle400}"
+                        Placeholder="Szukaj miasta…"
+                        TextChanged="OnCitySearchTextChanged"
+                        Unfocused="OnCitySearchUnfocused" />
+
+                    <!-- Przycisk czyszczenia pola -->
+                    <Border
+                        x:Name="ClearSearchButton"
+                        Grid.Column="2"
+                        IsVisible="False"
+                        VerticalOptions="Center"
+                        WidthRequest="24"
+                        HeightRequest="24"
+                        Padding="0"
+                        BackgroundColor="{StaticResource Paper300}"
+                        StrokeThickness="0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnClearSearchTapped" />
+                        </Border.GestureRecognizers>
+                        <Path
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="10"
+                            WidthRequest="10"
+                            Aspect="Uniform"
+                            Data="M0,0 L10,10 M10,0 L0,10"
+                            Stroke="{StaticResource Sepia600}"
+                            StrokeThickness="2"
+                            StrokeLineCap="Round" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Lista podpowiedzi -->
+            <Border
+                x:Name="CitySearchResultsPanel"
+                IsVisible="False"
+                BackgroundColor="{StaticResource Paper50}"
+                Stroke="{StaticResource BorderDefault}"
+                StrokeThickness="1"
+                Padding="0,8">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Walnut900}" Offset="0,6" Radius="18" Opacity="0.16" />
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="0">
+                    <Label
+                        Margin="16,2,16,6"
+                        Text="PODPOWIEDZI"
+                        FontFamily="{StaticResource FontUiSemibold}"
+                        FontSize="11"
+                        CharacterSpacing="1.8"
+                        TextColor="{StaticResource Saddle400}" />
+
+                    <CollectionView
+                        x:Name="CitySearchResults"
+                        SelectionMode="Single"
+                        SelectionChanged="OnCitySearchResultSelected"
+                        MaximumHeightRequest="220">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:City">
+                                <Label
+                                    Padding="16,10"
+                                    Text="{Binding Name}"
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="15"
+                                    TextColor="{StaticResource Walnut900}" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+
+        <!-- Liczniki wagonów: zaznaczone / wykonane trasy, jeden pod drugim przy prawej krawędzi. -->
+        <VerticalStackLayout
+            Margin="16"
             HorizontalOptions="End"
             VerticalOptions="Start"
-            BackgroundColor="#CC000000"
-            StrokeThickness="0">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
-            <Label
-                x:Name="CountersLabel"
-                FontSize="11"
-                TextColor="White" />
-        </Border>
+            WidthRequest="76"
+            Spacing="8">
 
-        <!-- Wyszukiwanie miasta: podpowiedzi podczas wpisywania, wybór = zoom + oznaczenie. -->
+            <Border
+                HorizontalOptions="Fill"
+                BackgroundColor="{StaticResource Paper50}"
+                Stroke="{StaticResource BorderDefault}"
+                StrokeThickness="1"
+                Padding="8,5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Walnut900}" Offset="0,3" Radius="10" Opacity="0.16" />
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                    <Label
+                        x:Name="SelectedCountLabel"
+                        Text="0"
+                        HorizontalOptions="Center"
+                        FontFamily="{StaticResource FontDisplayBold}"
+                        FontSize="19"
+                        TextColor="{StaticResource Walnut900}" />
+                    <Label
+                        Text="ZAZNACZONE"
+                        HorizontalOptions="Center"
+                        FontFamily="{StaticResource FontUiSemibold}"
+                        FontSize="8"
+                        CharacterSpacing="1.0"
+                        TextColor="{StaticResource Sepia600}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                HorizontalOptions="Fill"
+                BackgroundColor="{StaticResource Paper50}"
+                Stroke="{StaticResource BorderDefault}"
+                StrokeThickness="1"
+                Padding="8,5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Walnut900}" Offset="0,3" Radius="10" Opacity="0.16" />
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                    <Label
+                        x:Name="DoneCountLabel"
+                        Text="0"
+                        HorizontalOptions="Center"
+                        FontFamily="{StaticResource FontDisplayBold}"
+                        FontSize="19"
+                        TextColor="{StaticResource Rust600}" />
+                    <Label
+                        Text="WYKONANE"
+                        HorizontalOptions="Center"
+                        FontFamily="{StaticResource FontUiSemibold}"
+                        FontSize="8"
+                        CharacterSpacing="1.0"
+                        TextColor="{StaticResource Sepia600}" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+
+        <!-- Zoom mapy: przybliżanie (+) i oddalanie (−) w prawym dolnym rogu. -->
         <VerticalStackLayout
-            Margin="12,56,12,0"
-            HorizontalOptions="Center"
-            VerticalOptions="Start"
-            WidthRequest="280"
-            Spacing="4">
+            Margin="16"
+            HorizontalOptions="End"
+            VerticalOptions="End"
+            Spacing="10">
 
-            <Entry
-                x:Name="CitySearchEntry"
-                Placeholder="Szukaj miasta…"
-                BackgroundColor="White"
-                TextChanged="OnCitySearchTextChanged" />
+            <Border
+                WidthRequest="44"
+                HeightRequest="44"
+                Padding="0"
+                BackgroundColor="{StaticResource Paper50}"
+                Stroke="{StaticResource BorderDefault}"
+                StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="22" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Walnut900}" Offset="0,4" Radius="16" Opacity="0.16" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnZoomInTapped" />
+                </Border.GestureRecognizers>
+                <!-- Lupka z „+" -->
+                <Path
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HeightRequest="20"
+                    WidthRequest="20"
+                    Aspect="Uniform"
+                    Data="M9,2 A7,7 0 1 0 9,16 A7,7 0 1 0 9,2 M14,14 L20,20 M9,5.5 L9,12.5 M5.5,9 L12.5,9"
+                    Stroke="{StaticResource Sepia600}"
+                    StrokeThickness="2"
+                    StrokeLineCap="Round" />
+            </Border>
 
-            <CollectionView
-                x:Name="CitySearchResults"
-                IsVisible="False"
-                BackgroundColor="White"
-                SelectionMode="Single"
-                SelectionChanged="OnCitySearchResultSelected"
-                MaximumHeightRequest="200">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Label Padding="10,8" Text="{Binding Name}" />
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+            <Border
+                WidthRequest="44"
+                HeightRequest="44"
+                Padding="0"
+                BackgroundColor="{StaticResource Paper50}"
+                Stroke="{StaticResource BorderDefault}"
+                StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="22" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Walnut900}" Offset="0,4" Radius="16" Opacity="0.16" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnZoomOutTapped" />
+                </Border.GestureRecognizers>
+                <!-- Lupka z „−" -->
+                <Path
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HeightRequest="20"
+                    WidthRequest="20"
+                    Aspect="Uniform"
+                    Data="M9,2 A7,7 0 1 0 9,16 A7,7 0 1 0 9,2 M14,14 L20,20 M5.5,9 L12.5,9"
+                    Stroke="{StaticResource Sepia600}"
+                    StrokeThickness="2"
+                    StrokeLineCap="Round" />
+            </Border>
 
         </VerticalStackLayout>
 
