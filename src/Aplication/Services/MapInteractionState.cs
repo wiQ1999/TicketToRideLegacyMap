@@ -57,13 +57,6 @@ public sealed class MapInteractionState : IMapInteractionState
         RaiseChanged();
     }
 
-    public void ResetMarks()
-    {
-        _markedCities.Clear();
-        _routeStates.Clear();
-        RaiseChanged();
-    }
-
     private void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
     private static WagonColor PickRandomColor()

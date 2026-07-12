@@ -10,6 +10,5 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute("map", typeof(MapPage));
         Routing.RegisterRoute("developer", typeof(DeveloperPage));
-        Routing.RegisterRoute("settings", typeof(SettingsPage));
     }
 }

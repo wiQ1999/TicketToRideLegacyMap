@@ -35,7 +35,4 @@ public interface IMapInteractionState
 
     /// <summary>Rozpoczyna nową rozgrywkę: czyści oznaczenia, ustawia kolor, oznacza plan jako aktywny.</summary>
     void StartNewPlan(WagonColor color);
-
-    /// <summary>Czyści wszystkie oznaczenia miast oraz stany tras i zgłasza <see cref="Changed"/>.</summary>
-    void ResetMarks();
 }
