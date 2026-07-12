@@ -11,6 +11,8 @@ namespace Aplication.Controls;
 /// </summary>
 public sealed class MapBoardView : ContentView
 {
+    private const double ZoomStep = 1.6;
+
     private readonly MapViewport _viewport;
     private readonly MapDrawable _drawable;
     private readonly MapHitTester _hitTester;
@@ -161,6 +163,24 @@ public sealed class MapBoardView : ContentView
     public void CenterOnCity(City city)
     {
         _viewport.CenterOn(city.Position);
+        _graphicsView.Invalidate();
+    }
+
+    /// <summary>Programowo przybliża widok wokół środka kadru (przycisk „+").</summary>
+    public void ZoomIn() => ZoomAroundCenter(ZoomStep);
+
+    /// <summary>Programowo oddala widok wokół środka kadru (przycisk „−").</summary>
+    public void ZoomOut() => ZoomAroundCenter(1.0 / ZoomStep);
+
+    private void ZoomAroundCenter(double factor)
+    {
+        if (_graphicsView.Width <= 0 || _graphicsView.Height <= 0)
+        {
+            return;
+        }
+
+        var center = new PointF((float)(_graphicsView.Width / 2.0), (float)(_graphicsView.Height / 2.0));
+        _viewport.ZoomTo(_viewport.Scale * factor, center);
         _graphicsView.Invalidate();
     }
 
