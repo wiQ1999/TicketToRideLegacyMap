@@ -9,12 +9,16 @@ namespace Aplication.Rendering;
 /// </summary>
 public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteractionState? state) : IDrawable
 {
-    private static readonly Color CityMarkColor = Color.FromArgb("#EC407A");
+    private static readonly Color CityMarkBorderColor = Colors.White;
+    private static readonly Color CityMarkShadowColor = Color.FromArgb("#66000000");
     private static readonly Color DeveloperMarkerColor = Color.FromArgb("#1565C0");
     private static readonly Color DeveloperPendingCityColor = Color.FromArgb("#EF6C00");
     private static readonly Color DeveloperPendingWagonColor = Color.FromArgb("#00897B");
 
     public Microsoft.Maui.Graphics.IImage? Background { get; set; }
+
+    /// <summary>Biała ikona gwiazdy rysowana na środku oznaczonego miasta.</summary>
+    public Microsoft.Maui.Graphics.IImage? CityStar { get; set; }
 
     /// <summary>Robocze miasta (tryb deweloperski) rysowane jako znaczniki nad podkładem.</summary>
     public IReadOnlyList<MapPoint>? DeveloperMarkers { get; set; }
@@ -170,10 +174,25 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
             return;
         }
 
-        // Oznaczone: wypełniony punkt w kolorze akcentu.
+        // Oznaczone: powiększony okrąg w kolorze akcentu z białym obramowaniem, cieniem i gwiazdą.
         var center = viewport.MapToScreen(city.X, city.Y);
         var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
-        canvas.FillColor = CityMarkColor;
+        var borderWidth = (float)(MapMetrics.CityMarkBorderWidth * viewport.Scale);
+
+        // Białe koło pod spodem tworzy obramowanie; cień odcina znacznik od tła planszy.
+        canvas.SaveState();
+        canvas.SetShadow(new SizeF(0f, borderWidth), borderWidth * 1.5f, CityMarkShadowColor);
+        canvas.FillColor = CityMarkBorderColor;
         canvas.FillCircle(center.X, center.Y, radius);
+        canvas.RestoreState();
+
+        canvas.FillColor = RouteColorPalette.ToColor(state.WagonColor);
+        canvas.FillCircle(center.X, center.Y, radius - borderWidth);
+
+        if (CityStar is { } star)
+        {
+            var starSize = radius * 2f * (float)MapMetrics.CityStarScale;
+            canvas.DrawImage(star, center.X - starSize / 2f, center.Y - starSize / 2f, starSize, starSize);
+        }
     }
 }

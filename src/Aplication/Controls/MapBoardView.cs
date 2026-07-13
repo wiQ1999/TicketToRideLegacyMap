@@ -50,6 +50,7 @@ public sealed class MapBoardView : ContentView
         }
 
         LoadBackgroundAsync().FireAndForgetSafeAsync();
+        LoadCityStarAsync().FireAndForgetSafeAsync();
     }
 
     /// <summary>
@@ -199,6 +200,24 @@ public sealed class MapBoardView : ContentView
         catch
         {
             // Brak podkładu nie jest błędem krytycznym — tło rysowane jest wtedy kolorem.
+        }
+    }
+
+    private async Task LoadCityStarAsync()
+    {
+        try
+        {
+            await using var stream = await FileSystem.OpenAppPackageFileAsync("city-star.png")
+                .ConfigureAwait(false);
+            using var memory = new MemoryStream();
+            await stream.CopyToAsync(memory).ConfigureAwait(false);
+            memory.Position = 0;
+            _drawable.CityStar = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(memory);
+            _graphicsView.Invalidate();
+        }
+        catch
+        {
+            // Brak ikony gwiazdy nie jest błędem krytycznym — znacznik rysowany jest wtedy bez niej.
         }
     }
 }
