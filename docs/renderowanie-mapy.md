@@ -61,7 +61,7 @@ Scale    = fitScale
 
 `Draw` rysuje w kolejności: **1) tło → 2) trasy → 3) miasta**. Tło to opcjonalna **bitmapa podkładu**
 (`canvas.DrawImage` z tą samą transformacją) albo jednolity kolor, gdy podkładu brak. Bitmapy rastrowe
-(podkład, ikona gwiazdy oznaczonego miasta) leżą w `Resources/Raw/` i są wczytywane przez `MapBoardView`
+(podkład, ikona gwiazdy oznaczonego miasta, ikona kłódki wykonanej trasy) leżą w `Resources/Raw/` i są wczytywane przez `MapBoardView`
 (`FileSystem.OpenAppPackageFileAsync` → `PlatformImage.FromStream`); ikony z przezroczystością zapisuj
 jako **RGBA** (kanał alfa), nie jako RGB z „wypaloną" szachownicą. Liczniki (2.4),
 pole wyszukiwania (2.7) i przyciski przybliżania/oddalania (2.1) są poza kanwą — jako elementy XAML
@@ -87,15 +87,17 @@ Renderer jest **bezstanowy**: przy każdym `Draw` odpytuje **serwis stanu intera
 | Element / stan | Kanał renderowania |
 |---|---|
 | Trasa `None` | niewidoczna (podkład prześwituje) |
-| Trasa `Selected` | **obrys** każdego wagonika, wnętrze przezroczyste |
-| Trasa `Done` | **wypełnienie** każdego wagonika |
+| Trasa `Selected` | **wypełnienie** kolorem gracza z ukośnymi kreskami (45° względem boku wagonika) i obrysem |
+| Trasa `Done` | jak `Selected` + **ikona kłódki** na każdym wagoniku |
 | Miasto nieoznaczone | niewidoczne |
 | Miasto oznaczone (toggle) | okrąg w kolorze gracza z ikoną (gwiazda) |
 
-`Selected` (obrys) i `Done` (wypełnienie) używają **różnych kanałów**, więc pozostają rozróżnialne także przy
-zaburzeniach widzenia barw (2.3). Oznaczone miasto wypełniane jest **kolorem gracza** (`WagonColor`, ta sama
-paleta `RouteColorPalette` co wagoniki tras); geometrię znacznika (promień, obramowanie, skala ikony)
-parametryzuje `MapMetrics`. Trasa przechodzi cykl `None → Selected → Done → None`. Zmiana stanu w
+`Selected` i `Done` wypełniane są tym samym wzorem w **kolorze gracza**; `Done` odróżnia dodatkowy kanał —
+**ikona kłódki** — niezależny od koloru, więc pozostają rozróżnialne także przy zaburzeniach widzenia barw
+(2.3). Oznaczone miasto wypełniane jest tym samym kolorem gracza (`WagonColor`, paleta `RouteColorPalette`);
+geometrię znacznika miasta (promień, obramowanie, skala ikony) oraz styl wagonika (grubość obrysu, grubość,
+odstęp i kąt kresek, skala kłódki) parametryzuje `MapMetrics`. Kreski liczone są w lokalnym układzie wagonika,
+więc wzór obraca się razem z nim. Trasa przechodzi cykl `None → Selected → Done → None`. Zmiana stanu w
 serwisie → zdarzenie → `Invalidate()` → przerysowanie; dane bazowe mapy są niemutowalne, a „reset" czyści
 wyłącznie stan w serwisie.
 
