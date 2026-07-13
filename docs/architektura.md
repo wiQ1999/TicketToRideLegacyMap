@@ -108,9 +108,9 @@ Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec *
   przybliżania/oddalania (2.1), wyszukiwanie miasta rozwijane z ikony lupy — z listą podpowiedzi,
   zwijane po wyborze lub utracie focusu (2.7), nakładka z licznikami. Rendering: `GraphicsView`
   jak w [renderowanie-mapy.md](renderowanie-mapy.md).
-- **`DeveloperPage`** — ta sama kontrolka mapy jako podkład do wskazywania punktów (bez oznaczania
-  miast/tras ze standardowego trybu), listy robocze miast/tras z formularzami dodania/edycji,
-  przycisk kopiowania danych do schowka (2.8).
+- **`DeveloperPage`** — ta sama kontrolka mapy jako podkład: nakładka robocza rysuje oznaczane miasta
+  i wszystkie trasy różowym obrysem, z przyciskami przybliżania/oddalania +/− jak w widoku mapy; obok
+  listy robocze miast/tras z formularzami dodania/edycji i przycisk kopiowania danych do schowka (2.8).
 
 ---
 
@@ -120,7 +120,7 @@ Szablon zarządzania projektami/zadaniami został usunięty; zachowano wzorzec *
 |---|---|---|---|
 | **Główne menu** | `MainMenuPage` / `MainMenuPageModel` | Wybór koloru wagonów, „Nowy plan" (nowa rozgrywka) / „Kontynuuj" (gdy trwa) → mapa, tryb deweloperski. | 2.2, 2.5, 2.8 |
 | **Widok mapy** | `MapPage` / `MapPageModel` | Pełnoekranowa plansza, gesty zoom/pan + przyciski +/−, oznaczanie miast/tras, liczniki, wyszukiwanie miasta. | 2.1, 2.3, 2.4, 2.7 |
-| **Tryb deweloperski** | `DeveloperPage` / `DeveloperPageModel` | Robocze listy miast/tras, dodawanie przez wskazanie na mapie + formularz, edycja/usuwanie, eksport JSON. | 2.8 |
+| **Tryb deweloperski** | `DeveloperPage` / `DeveloperPageModel` | Robocze listy miast/tras, dodawanie przez wskazanie na mapie + formularz, edycja/usuwanie, przyciski +/−, eksport JSON. | 2.8 |
 
 Brak ekranu pomocy/onboardingu (3.4).
 
