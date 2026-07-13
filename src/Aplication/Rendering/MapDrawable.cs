@@ -12,9 +12,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
     private static readonly Color CityMarkBorderColor = Colors.White;
     private static readonly Color CityMarkShadowColor = Color.FromArgb("#66000000");
     private static readonly Color WagonStripeColor = Color.FromRgba(255, 255, 255, 90);
-    private static readonly Color DeveloperMarkerColor = Color.FromArgb("#1565C0");
-    private static readonly Color DeveloperPendingCityColor = Color.FromArgb("#EF6C00");
-    private static readonly Color DeveloperPendingWagonColor = Color.FromArgb("#00897B");
+    private static readonly Color DeveloperMarkColor = Color.FromArgb("#EC407A");
 
     public Microsoft.Maui.Graphics.IImage? Background { get; set; }
 
@@ -63,10 +61,12 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
     private void DrawDeveloperOverlay(ICanvas canvas)
     {
+        // Trasa robocza: sam prostokąt wagonika (obrys), widoczny po zaznaczeniu drugiego rogu.
         if (DeveloperWagons is { } wagons)
         {
-            canvas.StrokeColor = DeveloperMarkerColor;
-            canvas.StrokeSize = 2f;
+            canvas.StrokeColor = DeveloperMarkColor;
+            canvas.StrokeSize = (float)(MapMetrics.WagonBorderWidth * viewport.Scale);
+            canvas.StrokeLineJoin = LineJoin.Round;
             foreach (var wagon in wagons)
             {
                 var corners = wagon.Corners.Select(viewport.MapToScreen).ToArray();
@@ -82,25 +82,27 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
             }
         }
 
+        // Robocze miasta: sam obrys okręgu, bez wypełnienia.
         if (DeveloperMarkers is { } markers)
         {
-            canvas.FillColor = DeveloperMarkerColor;
+            canvas.StrokeColor = DeveloperMarkColor;
+            canvas.StrokeSize = (float)(MapMetrics.CityMarkBorderWidth * viewport.Scale);
+            var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
             foreach (var marker in markers)
             {
                 var center = viewport.MapToScreen(marker);
-                canvas.FillCircle(center.X, center.Y, (float)(MapMetrics.CityRadius * viewport.Scale));
+                canvas.DrawCircle(center.X, center.Y, radius);
             }
         }
 
-        if (DeveloperPendingPoint is { } pending)
+        // Wskazany, niezatwierdzony punkt miasta: sam obrys okręgu. Róg wagonika trasy nie ma osobnego
+        // znacznika — trasę widać dopiero jako prostokąt po zaznaczeniu drugiego rogu.
+        if (DeveloperPendingPoint is { } pending && !DeveloperPendingPointIsWagonCorner)
         {
             var center = viewport.MapToScreen(pending);
-            var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
-            canvas.StrokeColor = DeveloperPendingPointIsWagonCorner ? DeveloperPendingWagonColor : DeveloperPendingCityColor;
-            canvas.StrokeSize = 3f;
-            canvas.DrawCircle(center.X, center.Y, radius);
-            canvas.DrawLine(center.X - radius, center.Y, center.X + radius, center.Y);
-            canvas.DrawLine(center.X, center.Y - radius, center.X, center.Y + radius);
+            canvas.StrokeColor = DeveloperMarkColor;
+            canvas.StrokeSize = (float)(MapMetrics.CityMarkBorderWidth * viewport.Scale);
+            canvas.DrawCircle(center.X, center.Y, (float)(MapMetrics.CityRadius * viewport.Scale));
         }
     }
 
