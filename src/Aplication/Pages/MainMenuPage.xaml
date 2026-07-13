@@ -42,7 +42,7 @@
     </ContentPage.Resources>
 
     <Grid ColumnDefinitions="1.05*,0.95*"
-          Padding="{OnIdiom Phone='28,20', Default='64,40'}"
+          Padding="{OnIdiom Phone='28,10', Default='64,40'}"
           ColumnSpacing="{OnIdiom Phone=24, Default=64}">
 
         <!-- LEWA: branding -->
@@ -106,7 +106,7 @@
             VerticalOptions="Center"
             HorizontalOptions="Fill"
             MaximumWidthRequest="470"
-            Padding="26"
+            Padding="{OnIdiom Phone='26,16', Default=26}"
             BackgroundColor="{StaticResource Paper100}"
             Stroke="{StaticResource Walnut700}"
             StrokeThickness="1">
@@ -128,7 +128,7 @@
 
                 <!-- Kafelki kolorów: zaokrąglone kwadraty, rozłożone równomiernie -->
                 <FlexLayout
-                    Margin="0,16,0,0"
+                    Margin="{OnIdiom Phone='0,12,0,0', Default='0,16,0,0'}"
                     JustifyContent="SpaceBetween"
                     Wrap="NoWrap"
                     BindableLayout.ItemsSource="{Binding Colors}">
@@ -185,7 +185,7 @@
                 </FlexLayout>
 
                 <BoxView
-                    Margin="0,24,0,20"
+                    Margin="{OnIdiom Phone='0,16,0,14', Default='0,24,0,20'}"
                     HeightRequest="1"
                     Color="{StaticResource Walnut900}"
                     Opacity="0.18" />
@@ -229,7 +229,7 @@
                     TextColor="{StaticResource Sepia600}" />
 
                 <BoxView
-                    Margin="0,18,0,0"
+                    Margin="{OnIdiom Phone='0,12,0,0', Default='0,18,0,0'}"
                     HeightRequest="1"
                     Color="{StaticResource Walnut900}"
                     Opacity="0.1" />
