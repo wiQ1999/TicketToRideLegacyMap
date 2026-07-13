@@ -51,12 +51,26 @@ public partial class DeveloperPage : ContentPage
         }
 
         var markers = _pageModel.Cities.Select(c => c.Position).ToList();
+
+        // Wszystkie zatwierdzone trasy widoczne na stałe (jak miasta); edytowana trasa pochodzi z
+        // roboczych wagoników (PendingWagons), więc pomijamy ją tu, by nie dublować.
+        var editingRouteId = _pageModel.EditingRoute?.Id;
+        var wagons = _pageModel.Routes
+            .Where(r => r.Route.Id != editingRouteId)
+            .SelectMany(r => r.Route.Wagons)
+            .Concat(_pageModel.PendingWagons)
+            .ToList();
+
         _board.SetDeveloperOverlay(
             markers,
             _pageModel.OverlayPendingPoint,
             _pageModel.IsOverlayPendingPointWagonCorner,
-            _pageModel.PendingWagons);
+            wagons);
     }
+
+    private void OnZoomInTapped(object? sender, TappedEventArgs e) => _board?.ZoomIn();
+
+    private void OnZoomOutTapped(object? sender, TappedEventArgs e) => _board?.ZoomOut();
 
     private void OnNameSuggestionSelected(object? sender, SelectionChangedEventArgs e)
     {
