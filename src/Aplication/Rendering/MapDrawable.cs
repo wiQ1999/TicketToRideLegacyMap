@@ -11,6 +11,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 {
     private static readonly Color CityMarkBorderColor = Colors.White;
     private static readonly Color CityMarkShadowColor = Color.FromArgb("#66000000");
+    private static readonly Color WagonStripeColor = Color.FromRgba(255, 255, 255, 90);
     private static readonly Color DeveloperMarkerColor = Color.FromArgb("#1565C0");
     private static readonly Color DeveloperPendingCityColor = Color.FromArgb("#EF6C00");
     private static readonly Color DeveloperPendingWagonColor = Color.FromArgb("#00897B");
@@ -19,6 +20,9 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
     /// <summary>Biała ikona gwiazdy rysowana na środku oznaczonego miasta.</summary>
     public Microsoft.Maui.Graphics.IImage? CityStar { get; set; }
+
+    /// <summary>Biała ikona kłódki rysowana na wagonikach trasy wykonanej.</summary>
+    public Microsoft.Maui.Graphics.IImage? WagonLock { get; set; }
 
     /// <summary>Robocze miasta (tryb deweloperski) rysowane jako znaczniki nad podkładem.</summary>
     public IReadOnlyList<MapPoint>? DeveloperMarkers { get; set; }
@@ -127,9 +131,6 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
             return;
         }
 
-        canvas.StrokeLineJoin = LineJoin.Miter;
-        canvas.StrokeLineCap = LineCap.Butt;
-
         foreach (var wagon in route.Wagons)
         {
             DrawWagon(canvas, wagon, routeState, state.WagonColor);
@@ -150,21 +151,76 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
         var playerColor = RouteColorPalette.ToColor(wagonColor);
 
-        if (routeState == RouteState.Done)
+        // Zaznaczona i wykonana: pełne wypełnienie kolorem gracza z ukośnym wzorem i ciemnym obrysem.
+        // Wykonaną dodatkowo znaczy kłódka — inny kanał wizualny niż sam kolor, więc rozróżnialna
+        // także przy zaburzeniach widzenia barw.
+        canvas.FillColor = playerColor;
+        canvas.FillPath(path);
+
+        canvas.SaveState();
+        canvas.ClipPath(path);
+        DrawWagonStripes(canvas, corners);
+        canvas.RestoreState();
+
+        canvas.StrokeColor = Darken(playerColor, 0.55f);
+        canvas.StrokeSize = (float)(MapMetrics.WagonBorderWidth * viewport.Scale);
+        canvas.StrokeLineJoin = LineJoin.Round;
+        canvas.DrawPath(path);
+
+        if (routeState == RouteState.Done && WagonLock is { } lockIcon)
         {
-            // Wykonana: pełne wypełnienie kolorem wagonów gracza.
-            canvas.FillColor = playerColor;
-            canvas.FillPath(path);
-        }
-        else
-        {
-            // Zaznaczona: sam obrys kolorem wagonów gracza, wnętrze przezroczyste — inny kanał
-            // wizualny niż wypełnienie, więc rozróżnialne także przy zaburzeniach widzenia barw.
-            canvas.StrokeColor = playerColor;
-            canvas.StrokeSize = 3f;
-            canvas.DrawPath(path);
+            var shorter = Math.Min(Distance(corners[0], corners[1]), Distance(corners[1], corners[2]));
+            var lockSize = (float)(shorter * MapMetrics.WagonLockScale);
+            var center = new PointF(corners.Average(p => p.X), corners.Average(p => p.Y));
+            canvas.DrawImage(lockIcon, center.X - lockSize / 2f, center.Y - lockSize / 2f, lockSize, lockSize);
         }
     }
+
+    private void DrawWagonStripes(ICanvas canvas, PointF[] corners)
+    {
+        var step = (float)(MapMetrics.WagonStripeSpacing * viewport.Scale);
+        if (step < 0.5f)
+        {
+            return;
+        }
+
+        // Kierunek kresek liczony względem samego wagonika: oś dłuższego boku (róg 1 → róg 2) plus
+        // zadany kąt, więc wzór jest pod 45° do boków wagonika niezależnie od jego obrotu na planszy.
+        var axis = Math.Atan2(corners[2].Y - corners[1].Y, corners[2].X - corners[1].X);
+        var angle = axis + (MapMetrics.WagonStripeAngleDegrees * Math.PI / 180.0);
+        var dir = new PointF((float)Math.Cos(angle), (float)Math.Sin(angle));
+        var normal = new PointF(-dir.Y, dir.X);
+
+        // Rzuty rogów na kierunek kresek (dir) i prostopadły (normal) wyznaczają zakres wzoru.
+        float pMin = float.MaxValue, pMax = float.MinValue, qMin = float.MaxValue, qMax = float.MinValue;
+        foreach (var corner in corners)
+        {
+            var p = (corner.X * normal.X) + (corner.Y * normal.Y);
+            var q = (corner.X * dir.X) + (corner.Y * dir.Y);
+            pMin = Math.Min(pMin, p);
+            pMax = Math.Max(pMax, p);
+            qMin = Math.Min(qMin, q);
+            qMax = Math.Max(qMax, q);
+        }
+
+        canvas.StrokeColor = WagonStripeColor;
+        canvas.StrokeSize = (float)(MapMetrics.WagonStripeWidth * viewport.Scale);
+        canvas.StrokeLineCap = LineCap.Butt;
+
+        // Równoległe kreski (kierunek dir), przesuwane co „step" wzdłuż prostopadłej; ClipPath tnie je
+        // do kształtu wagonika.
+        for (var t = pMin; t <= pMax; t += step)
+        {
+            var start = new PointF((t * normal.X) + (qMin * dir.X), (t * normal.Y) + (qMin * dir.Y));
+            var end = new PointF((t * normal.X) + (qMax * dir.X), (t * normal.Y) + (qMax * dir.Y));
+            canvas.DrawLine(start, end);
+        }
+    }
+
+    private static float Distance(PointF a, PointF b) => (float)Math.Sqrt(((a.X - b.X) * (a.X - b.X)) + ((a.Y - b.Y) * (a.Y - b.Y)));
+
+    private static Color Darken(Color color, float factor) =>
+        Color.FromRgba(color.Red * factor, color.Green * factor, color.Blue * factor, color.Alpha);
 
     private void DrawCity(ICanvas canvas, City city, IMapInteractionState state)
     {

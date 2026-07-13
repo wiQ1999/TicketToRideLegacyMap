@@ -15,4 +15,19 @@ public static class MapMetrics
 
     /// <summary>Skala ikony gwiazdy względem średnicy okręgu miasta (0–1).</summary>
     public const double CityStarScale = 0.6;
+
+    /// <summary>Grubość obrysu wagonika zaznaczonej/wykonanej trasy (w jednostkach mapy).</summary>
+    public const double WagonBorderWidth = 2.0;
+
+    /// <summary>Grubość ukośnej kreski wzoru wypełnienia wagonika (w jednostkach mapy).</summary>
+    public const double WagonStripeWidth = 5.0;
+
+    /// <summary>Odstęp (okres) między kolejnymi ukośnymi kreskami wzoru wagonika (w jednostkach mapy).</summary>
+    public const double WagonStripeSpacing = 13.0;
+
+    /// <summary>Kąt ukośnych kresek wzoru wagonika względem jego dłuższego boku (w stopniach).</summary>
+    public const double WagonStripeAngleDegrees = 45.0;
+
+    /// <summary>Skala ikony kłódki (trasa wykonana) względem krótszego boku wagonika (0–1).</summary>
+    public const double WagonLockScale = 0.8;
 }

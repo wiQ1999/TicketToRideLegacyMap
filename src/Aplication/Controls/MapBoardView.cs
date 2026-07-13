@@ -51,6 +51,7 @@ public sealed class MapBoardView : ContentView
 
         LoadBackgroundAsync().FireAndForgetSafeAsync();
         LoadCityStarAsync().FireAndForgetSafeAsync();
+        LoadWagonLockAsync().FireAndForgetSafeAsync();
     }
 
     /// <summary>
@@ -218,6 +219,24 @@ public sealed class MapBoardView : ContentView
         catch
         {
             // Brak ikony gwiazdy nie jest błędem krytycznym — znacznik rysowany jest wtedy bez niej.
+        }
+    }
+
+    private async Task LoadWagonLockAsync()
+    {
+        try
+        {
+            await using var stream = await FileSystem.OpenAppPackageFileAsync("wagon-lock.png")
+                .ConfigureAwait(false);
+            using var memory = new MemoryStream();
+            await stream.CopyToAsync(memory).ConfigureAwait(false);
+            memory.Position = 0;
+            _drawable.WagonLock = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(memory);
+            _graphicsView.Invalidate();
+        }
+        catch
+        {
+            // Brak ikony kłódki nie jest błędem krytycznym — wagonik wykonanej trasy rysowany jest wtedy bez niej.
         }
     }
 }
