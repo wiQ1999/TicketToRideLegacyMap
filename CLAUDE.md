@@ -30,6 +30,7 @@ Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłą
   `dotnet build "src/Aplication/Aplication.csproj" -f net10.0-windows10.0.19041.0 -c Debug`
 - Target frameworki: `net10.0-android` (+ `-ios`, `-maccatalyst`; `-windows...` tylko na Windows).
 - Domyślna powłoka: PowerShell (Windows); dostępny też Bash. Dane mapy i podkład: `src/Aplication/Resources/Raw/`.
+- Wydawanie instalek dla testerów (podpisany APK + GitHub Releases; iOS odłożony): [docs/release.md](docs/release.md).
 
 ## Praca nad UI
 
