@@ -8,7 +8,7 @@ namespace Aplication.Rendering;
 public static class MapMetrics
 {
     /// <summary>Promień okręgu miasta (średnica = 2×). Steruje wielkością kropki miasta.</summary>
-    public const double CityRadius = 20.0;
+    public const double CityRadius = 15.0;
 
     /// <summary>Grubość białego obramowania oznaczonego miasta (w jednostkach mapy).</summary>
     public const double CityMarkBorderWidth = 2.0;
@@ -20,14 +20,14 @@ public static class MapMetrics
     public const double WagonBorderWidth = 2.0;
 
     /// <summary>Grubość ukośnej kreski wzoru wypełnienia wagonika (w jednostkach mapy).</summary>
-    public const double WagonStripeWidth = 5.0;
+    public const double WagonStripeWidth = 3.0;
 
     /// <summary>Odstęp (okres) między kolejnymi ukośnymi kreskami wzoru wagonika (w jednostkach mapy).</summary>
-    public const double WagonStripeSpacing = 13.0;
+    public const double WagonStripeSpacing = 8.0;
 
     /// <summary>Kąt ukośnych kresek wzoru wagonika względem jego dłuższego boku (w stopniach).</summary>
     public const double WagonStripeAngleDegrees = 45.0;
 
     /// <summary>Skala ikony kłódki (trasa wykonana) względem krótszego boku wagonika (0–1).</summary>
-    public const double WagonLockScale = 0.8;
+    public const double WagonLockScale = 0.85;
 }
