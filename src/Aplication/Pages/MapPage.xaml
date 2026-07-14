@@ -180,7 +180,7 @@
             Margin="16"
             HorizontalOptions="End"
             VerticalOptions="Start"
-            WidthRequest="76"
+            WidthRequest="80"
             Spacing="8">
 
             <Border
