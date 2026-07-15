@@ -11,7 +11,7 @@ namespace Aplication.Controls;
 /// </summary>
 public sealed class MapBoardView : ContentView
 {
-    private const double ZoomStep = 1.6;
+    private const double ZoomStep = 1.3;
 
     private readonly MapViewport _viewport;
     private readonly MapDrawable _drawable;
@@ -44,10 +44,7 @@ public sealed class MapBoardView : ContentView
         Content = _graphicsView;
 
         _graphicsView.SizeChanged += OnSizeChanged;
-        if (_state is not null)
-        {
-            _state.Changed += OnStateChanged;
-        }
+        _state?.Changed += OnStateChanged;
 
         LoadBackgroundAsync().FireAndForgetSafeAsync();
         LoadCityStarAsync().FireAndForgetSafeAsync();
