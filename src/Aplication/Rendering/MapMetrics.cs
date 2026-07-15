@@ -19,6 +19,15 @@ public static class MapMetrics
     /// <summary>Grubość obrysu wagonika zaznaczonej/wykonanej trasy (w jednostkach mapy).</summary>
     public const double WagonBorderWidth = 2.0;
 
+    /// <summary>Współczynnik ściemnienia koloru gracza użytego na obrys wagonika (0–1; mniej = ciemniej).</summary>
+    public const double WagonBorderDarkenFactor = 0.55;
+
+    /// <summary>Pionowe odsunięcie cienia oznaczonego miasta jako wielokrotność grubości obramowania.</summary>
+    public const double CityMarkShadowOffsetScale = 1.0;
+
+    /// <summary>Rozmycie cienia oznaczonego miasta jako wielokrotność grubości obramowania.</summary>
+    public const double CityMarkShadowBlurScale = 1.5;
+
     /// <summary>Grubość ukośnej kreski wzoru wypełnienia wagonika (w jednostkach mapy).</summary>
     public const double WagonStripeWidth = 3.0;
 

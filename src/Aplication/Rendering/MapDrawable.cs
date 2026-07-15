@@ -9,11 +9,6 @@ namespace Aplication.Rendering;
 /// </summary>
 public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteractionState? state) : IDrawable
 {
-    private static readonly Color CityMarkBorderColor = Colors.White;
-    private static readonly Color CityMarkShadowColor = Color.FromArgb("#66000000");
-    private static readonly Color WagonStripeColor = Color.FromRgba(255, 255, 255, 90);
-    private static readonly Color DeveloperMarkColor = Color.FromArgb("#EC407A");
-
     public Microsoft.Maui.Graphics.IImage? Background { get; set; }
 
     /// <summary>Biała ikona gwiazdy rysowana na środku oznaczonego miasta.</summary>
@@ -64,7 +59,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         // Trasa robocza: sam prostokąt wagonika (obrys), widoczny po zaznaczeniu drugiego rogu.
         if (DeveloperWagons is { } wagons)
         {
-            canvas.StrokeColor = DeveloperMarkColor;
+            canvas.StrokeColor = MapPalette.DeveloperMark;
             canvas.StrokeSize = (float)(MapMetrics.WagonBorderWidth * viewport.Scale);
             canvas.StrokeLineJoin = LineJoin.Round;
             foreach (var wagon in wagons)
@@ -85,7 +80,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         // Robocze miasta: sam obrys okręgu, bez wypełnienia.
         if (DeveloperMarkers is { } markers)
         {
-            canvas.StrokeColor = DeveloperMarkColor;
+            canvas.StrokeColor = MapPalette.DeveloperMark;
             canvas.StrokeSize = (float)(MapMetrics.CityMarkBorderWidth * viewport.Scale);
             var radius = (float)(MapMetrics.CityRadius * viewport.Scale);
             foreach (var marker in markers)
@@ -100,7 +95,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         if (DeveloperPendingPoint is { } pending && !DeveloperPendingPointIsWagonCorner)
         {
             var center = viewport.MapToScreen(pending);
-            canvas.StrokeColor = DeveloperMarkColor;
+            canvas.StrokeColor = MapPalette.DeveloperMark;
             canvas.StrokeSize = (float)(MapMetrics.CityMarkBorderWidth * viewport.Scale);
             canvas.DrawCircle(center.X, center.Y, (float)(MapMetrics.CityRadius * viewport.Scale));
         }
@@ -118,7 +113,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         }
         else
         {
-            canvas.FillColor = Color.FromArgb("#E9DBB8"); // neutralne tło planszy
+            canvas.FillColor = MapPalette.BoardFallback;
             canvas.FillRectangle(origin.X, origin.Y, width, height);
         }
     }
@@ -164,7 +159,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
         DrawWagonStripes(canvas, corners);
         canvas.RestoreState();
 
-        canvas.StrokeColor = Darken(playerColor, 0.55f);
+        canvas.StrokeColor = Darken(playerColor, (float)MapMetrics.WagonBorderDarkenFactor);
         canvas.StrokeSize = (float)(MapMetrics.WagonBorderWidth * viewport.Scale);
         canvas.StrokeLineJoin = LineJoin.Round;
         canvas.DrawPath(path);
@@ -205,7 +200,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
             qMax = Math.Max(qMax, q);
         }
 
-        canvas.StrokeColor = WagonStripeColor;
+        canvas.StrokeColor = MapPalette.WagonStripe;
         canvas.StrokeSize = (float)(MapMetrics.WagonStripeWidth * viewport.Scale);
         canvas.StrokeLineCap = LineCap.Butt;
 
@@ -239,8 +234,11 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
         // Białe koło pod spodem tworzy obramowanie; cień odcina znacznik od tła planszy.
         canvas.SaveState();
-        canvas.SetShadow(new SizeF(0f, borderWidth), borderWidth * 1.5f, CityMarkShadowColor);
-        canvas.FillColor = CityMarkBorderColor;
+        canvas.SetShadow(
+            new SizeF(0f, borderWidth * (float)MapMetrics.CityMarkShadowOffsetScale),
+            borderWidth * (float)MapMetrics.CityMarkShadowBlurScale,
+            MapPalette.CityMarkShadow);
+        canvas.FillColor = MapPalette.CityMarkBorder;
         canvas.FillCircle(center.X, center.Y, radius);
         canvas.RestoreState();
 
