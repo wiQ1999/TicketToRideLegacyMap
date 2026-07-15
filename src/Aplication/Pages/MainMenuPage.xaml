@@ -62,7 +62,7 @@
 
                 <Label
                     Text="Legendy&#10;Zachodu"
-                    FontFamily="{StaticResource FontDisplayBlack}"
+                    FontFamily="{StaticResource FontSignageBlack}"
                     FontSize="{OnIdiom Phone=52, Default=70}"
                     LineHeight="0.98"
                     TextColor="{StaticResource Rust600}" />

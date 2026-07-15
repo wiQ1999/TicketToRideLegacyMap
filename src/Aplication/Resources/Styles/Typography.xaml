@@ -7,16 +7,10 @@
     <x:String x:Key="FontDisplayBold">CinzelBold</x:String>
     <x:String x:Key="FontDisplayBlack">CinzelBlack</x:String>
 
-    <x:String x:Key="FontSignage">CinzelDecorativeRegular</x:String>
-    <x:String x:Key="FontSignageBold">CinzelDecorativeBold</x:String>
     <x:String x:Key="FontSignageBlack">CinzelDecorativeBlack</x:String>
 
-    <x:String x:Key="FontUi">BitterRegular</x:String>
     <x:String x:Key="FontUiSemibold">BitterSemibold</x:String>
     <x:String x:Key="FontUiBold">BitterBold</x:String>
-
     <x:String x:Key="FontBody">BitterRegular</x:String>
-
-    <x:String x:Key="FontNumeric">BitterRegular</x:String>
 
 </ResourceDictionary>
