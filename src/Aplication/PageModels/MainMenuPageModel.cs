@@ -1,3 +1,4 @@
+using Aplication.Rendering;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -90,12 +91,10 @@ public sealed partial class MainMenuPageModel : ObservableObject
 
     private IReadOnlyList<ColorChoice> BuildColors() =>
     [
-        new ColorChoice(WagonColor.Czarny, "Czarny", Swatch("TrainBlack"), SelectColorCommand),
-        new ColorChoice(WagonColor.Czerwony, "Czerwony", Swatch("TrainRed"), SelectColorCommand),
-        new ColorChoice(WagonColor.Niebieski, "Niebieski", Swatch("TrainBlue"), SelectColorCommand),
-        new ColorChoice(WagonColor.Zielony, "Zielony", Swatch("TrainGreen"), SelectColorCommand),
-        new ColorChoice(WagonColor.Zolty, "Żółty", Swatch("TrainYellow"), SelectColorCommand)
+        new ColorChoice(WagonColor.Czarny, "Czarny", RouteColorPalette.ToColor(WagonColor.Czarny), SelectColorCommand),
+        new ColorChoice(WagonColor.Czerwony, "Czerwony", RouteColorPalette.ToColor(WagonColor.Czerwony), SelectColorCommand),
+        new ColorChoice(WagonColor.Niebieski, "Niebieski", RouteColorPalette.ToColor(WagonColor.Niebieski), SelectColorCommand),
+        new ColorChoice(WagonColor.Zielony, "Zielony", RouteColorPalette.ToColor(WagonColor.Zielony), SelectColorCommand),
+        new ColorChoice(WagonColor.Zolty, "Żółty", RouteColorPalette.ToColor(WagonColor.Zolty), SelectColorCommand)
     ];
-
-    private static Color Swatch(string resourceKey) => (Color)Application.Current!.Resources[resourceKey];
 }

@@ -1,6 +1,9 @@
 namespace Aplication.Rendering;
 
-/// <summary>Odwzorowanie palety koloru wagonów gracza (<see cref="WagonColor"/>) na kolor ekranowy.</summary>
+/// <summary>
+/// Jedyne źródło koloru wagonów gracza (<see cref="WagonColor"/>) na kolor ekranowy — wspólne dla
+/// renderera planszy i próbek koloru w menu, więc podgląd i rysunek są zawsze zgodne.
+/// </summary>
 public static class RouteColorPalette
 {
     public static Color ToColor(WagonColor color) => color switch
