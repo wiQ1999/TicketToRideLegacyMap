@@ -94,9 +94,11 @@ Renderer jest **bezstanowy**: przy każdym `Draw` odpytuje **serwis stanu intera
 
 `Selected` i `Done` wypełniane są tym samym wzorem w **kolorze gracza**; `Done` odróżnia dodatkowy kanał —
 **ikona kłódki** — niezależny od koloru, więc pozostają rozróżnialne także przy zaburzeniach widzenia barw
-(2.3). Oznaczone miasto wypełniane jest tym samym kolorem gracza (`WagonColor`, paleta `RouteColorPalette`);
-geometrię znacznika miasta (promień, obramowanie, skala ikony) oraz styl wagonika (grubość obrysu, grubość,
-odstęp i kąt kresek, skala kłódki) parametryzuje `MapMetrics`. Kreski liczone są w lokalnym układzie wagonika,
+(2.3). Oznaczone miasto wypełniane jest tym samym kolorem gracza (`WagonColor`); kolory wagonów mają jedyne
+źródło w `RouteColorPalette` (C#), współdzielone też z próbkami koloru w menu, więc podgląd i rysunek są zgodne.
+Geometrię znacznika miasta (promień, obramowanie, skala ikony) oraz styl wagonika (grubość obrysu, grubość,
+odstęp i kąt kresek, skala kłódki) parametryzuje `MapMetrics`, a pozostałe kolory renderera (obramowanie i cień
+znacznika, wzór wypełnienia, tło zastępcze) — `MapPalette`. Kreski liczone są w lokalnym układzie wagonika,
 więc wzór obraca się razem z nim. Trasa przechodzi cykl `None → Selected → Done → None`. Zmiana stanu w
 serwisie → zdarzenie → `Invalidate()` → przerysowanie; dane bazowe mapy są niemutowalne, a „reset" czyści
 wyłącznie stan w serwisie.

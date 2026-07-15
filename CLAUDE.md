@@ -43,6 +43,13 @@ Jeden projekt: `src/Aplication`. Interfejs po polsku, działanie offline, wyłą
   (Cinzel / Cinzel Decorative / Bitter — zarejestrowane w `MauiProgram.cs`, pliki `.ttf` w
   `Resources/Fonts/`, licencje OFL w `Resources/Fonts/Licenses/`). Stosuj tokeny
   (`{StaticResource ...}`) zamiast wpisywać kolory/rodziny czcionek na sztywno.
+- Aplikacja jest **jednomotywowa**: wymuszony jasny motyw (`UserAppTheme = AppTheme.Light` w `App`),
+  tła paneli zawsze pergaminowe — nie zakładaj trybu ciemnego (gałęzie `Dark=` w `AppThemeBinding`
+  są praktycznie martwe). `Colors.xaml` trzyma tylko paletę „Legendy Zachodu" + neutralne
+  `White`/`Black`; domyślna paleta szablonu MAUI (Primary, rampa `Gray*`, pędzle) została usunięta,
+  a `Styles.xaml` przycięty do faktycznie używanych kontrolek.
+- **Wyjątek od tokenów XAML:** kolory wagonów gracza mają jedyne źródło w `Rendering/RouteColorPalette`
+  (C#), współdzielone przez renderer i próbki koloru w menu (`MainMenuPageModel`) — nie ma ich w `Colors.xaml`.
 - Mockupy widoków (PDF) leżą w `docs/mockups/`.
 
 ## Architektura renderowania (big picture)
