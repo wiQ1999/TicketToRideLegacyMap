@@ -9,7 +9,7 @@ namespace Aplication.Controls;
 /// deweloperskim (stan = <c>null</c>) tap zgłasza wskazane położenie przez <see cref="MapPointPicked"/>,
 /// a plansza służy jako podkład z nakładką roboczą.
 /// </summary>
-public sealed class MapBoardView : ContentView
+public sealed partial class MapBoardView : ContentView
 {
     private const double ZoomStep = 1.3;
 
@@ -19,9 +19,11 @@ public sealed class MapBoardView : ContentView
     private readonly IMapInteractionState? _state;
     private readonly GraphicsView _graphicsView;
 
+#if !ANDROID
     private double _pinchStartScale = 1.0;
     private double _lastPanX;
     private double _lastPanY;
+#endif
 
     /// <summary>Zgłaszane po dotknięciu planszy w trybie deweloperskim — z punktem w przestrzeni mapy.</summary>
     public event EventHandler<MapPoint>? MapPointPicked;
@@ -70,6 +72,11 @@ public sealed class MapBoardView : ContentView
 
     private void AddGestures()
     {
+#if ANDROID
+        // Multi-touch pinch/pan na GraphicsView jest na Androidzie zawodny (ograniczenie MAUI) —
+        // wszystkie gesty (tap/pan/pinch) obsługuje natywny handler dotyku (partial dla Androida).
+        HookPlatformGestures();
+#else
         var tap = new TapGestureRecognizer();
         tap.Tapped += OnTapped;
         _graphicsView.GestureRecognizers.Add(tap);
@@ -81,6 +88,7 @@ public sealed class MapBoardView : ContentView
         var pan = new PanGestureRecognizer();
         pan.PanUpdated += OnPanUpdated;
         _graphicsView.GestureRecognizers.Add(pan);
+#endif
     }
 
     private void OnSizeChanged(object? sender, EventArgs e)
@@ -95,22 +103,19 @@ public sealed class MapBoardView : ContentView
         _graphicsView.Invalidate();
     }
 
-    private void OnTapped(object? sender, TappedEventArgs e)
+    /// <summary>
+    /// Wykonuje dotyk w punkcie ekranu (DIP). W trybie mapy przechodzi przez hit-testing do toggle
+    /// miasta / cyklu trasy; w trybie deweloperskim zgłasza surowe położenie przez <see cref="MapPointPicked"/>.
+    /// </summary>
+    private void PerformTap(double x, double y)
     {
-        var position = e.GetPosition(_graphicsView);
-        if (position is not { } p)
-        {
-            return;
-        }
-
-        // Tryb deweloperski: tap wskazuje surowe położenie na mapie, bez oznaczania miast/tras.
         if (_state is not { } state)
         {
-            MapPointPicked?.Invoke(this, _viewport.ScreenToMap(p.X, p.Y));
+            MapPointPicked?.Invoke(this, _viewport.ScreenToMap(x, y));
             return;
         }
 
-        var hit = _hitTester.HitTest(new PointF((float)p.X, (float)p.Y), _viewport);
+        var hit = _hitTester.HitTest(new PointF((float)x, (float)y), _viewport);
         switch (hit.Kind)
         {
             case MapHitKind.City:
@@ -119,6 +124,27 @@ public sealed class MapBoardView : ContentView
             case MapHitKind.Route:
                 state.CycleRoute(hit.Id);
                 break;
+        }
+    }
+
+    private void PanByScreen(double dxScreen, double dyScreen)
+    {
+        _viewport.PanBy(dxScreen, dyScreen);
+        _graphicsView.Invalidate();
+    }
+
+    private void ScaleBy(double factor, float pivotX, float pivotY)
+    {
+        _viewport.ZoomTo(_viewport.Scale * factor, new PointF(pivotX, pivotY));
+        _graphicsView.Invalidate();
+    }
+
+#if !ANDROID
+    private void OnTapped(object? sender, TappedEventArgs e)
+    {
+        if (e.GetPosition(_graphicsView) is { } p)
+        {
+            PerformTap(p.X, p.Y);
         }
     }
 
@@ -155,6 +181,7 @@ public sealed class MapBoardView : ContentView
                 break;
         }
     }
+#endif
 
     private void OnStateChanged(object? sender, EventArgs e) => _graphicsView.Invalidate();
 
