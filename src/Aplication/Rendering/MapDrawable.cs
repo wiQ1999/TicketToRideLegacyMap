@@ -34,6 +34,7 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
+        DrawOutsidePattern(canvas, dirtyRect);
         DrawBackground(canvas);
 
         if (state is { } interactionState)
@@ -98,6 +99,29 @@ public sealed class MapDrawable(MapData map, MapViewport viewport, IMapInteracti
             canvas.StrokeColor = MapPalette.DeveloperMark;
             canvas.StrokeSize = (float)(MapMetrics.CityMarkBorderWidth * viewport.Scale);
             canvas.DrawCircle(center.X, center.Y, (float)(MapMetrics.CityRadius * viewport.Scale));
+        }
+    }
+
+    private static void DrawOutsidePattern(ICanvas canvas, RectF dirtyRect)
+    {
+        // Pełne tło pod całą kontrolką; podkład planszy (nieprzezroczysty) rysowany jest na wierzchu,
+        // więc siatka kropek zostaje widoczna tylko w marginesie poza planszą.
+        canvas.FillColor = MapPalette.OutsideBase;
+        canvas.FillRectangle(dirtyRect);
+
+        var spacing = MapMetrics.OutsideDotSpacing;
+        canvas.FillColor = MapPalette.OutsideDot;
+
+        // Siatka zakotwiczona do (0,0) ekranu, o stałym rozmiarze (niezależnym od zoomu). Co drugi rząd
+        // przesunięty o pół odstępu — delikatny, „utkany" wzór.
+        var row = 0;
+        for (var y = dirtyRect.Top; y <= dirtyRect.Bottom; y += spacing, row++)
+        {
+            var offset = (row % 2 == 0) ? 0f : spacing / 2f;
+            for (var x = dirtyRect.Left + offset; x <= dirtyRect.Right; x += spacing)
+            {
+                canvas.FillCircle(x, y, MapMetrics.OutsideDotRadius);
+            }
         }
     }
 
