@@ -6,7 +6,7 @@
 
     <Style TargetType="Label">
         <Setter Property="TextColor"
-                Value="{AppThemeBinding Light={StaticResource DarkOnLightBackground}, Dark={StaticResource LightOnDarkBackground}}" />
+                Value="{AppThemeBinding Light={StaticResource Walnut900}, Dark={StaticResource Paper200}}" />
         <Setter Property="BackgroundColor"
                 Value="Transparent" />
         <Setter Property="FontSize"
@@ -20,7 +20,7 @@
                     <VisualState x:Name="Disabled">
                         <VisualState.Setters>
                             <Setter Property="TextColor"
-                                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+                                    Value="{AppThemeBinding Light={StaticResource Paper500}, Dark={StaticResource Walnut700}}" />
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>
