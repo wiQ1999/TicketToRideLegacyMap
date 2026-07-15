@@ -20,4 +20,10 @@ public static class MapPalette
 
     /// <summary>Neutralne tło planszy rysowane, gdy brak podkładu graficznego.</summary>
     public static readonly Color BoardFallback = Color.FromArgb("#E9DBB8");
+
+    /// <summary>Pergaminowe tło obszaru poza planszą (widoczne po oddaleniu/przesunięciu).</summary>
+    public static readonly Color OutsideBase = Color.FromArgb("#E7D6AE");
+
+    /// <summary>Kropki delikatnej siatki na tle poza planszą.</summary>
+    public static readonly Color OutsideDot = Color.FromRgba(107, 74, 43, 38);
 }

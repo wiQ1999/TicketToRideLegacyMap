@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:Aplication.Models"
     Shell.NavBarIsVisible="False"
+    BackgroundColor="{StaticResource Paper300}"
     Title="Mapa">
 
     <Grid x:Name="RootLayout">

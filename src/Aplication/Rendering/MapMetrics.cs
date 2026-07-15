@@ -39,4 +39,10 @@ public static class MapMetrics
 
     /// <summary>Skala ikony kłódki (trasa wykonana) względem krótszego boku wagonika (0–1).</summary>
     public const double WagonLockScale = 0.85;
+
+    /// <summary>Odstęp siatki kropek tła poza planszą (w pikselach ekranu, niezależny od zoomu).</summary>
+    public const float OutsideDotSpacing = 22f;
+
+    /// <summary>Promień kropki siatki tła poza planszą (w pikselach ekranu, niezależny od zoomu).</summary>
+    public const float OutsideDotRadius = 1.5f;
 }
